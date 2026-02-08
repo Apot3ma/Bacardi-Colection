@@ -1,0 +1,75 @@
+<div class="background-container">
+  <div class="light-ray light-ray-1"></div>
+  <div class="light-ray light-ray-2"></div>
+  <div class="light-ray light-ray-3"></div>
+</div>
+
+<div class="page-container registro-page">
+  <div class="card registro-container fade-in">
+    <div class="registro-header text-center">
+      <h2>Registro</h2>
+      <p>Crea tu cuenta</p>
+    </div>
+    
+    @if (registroForm){
+    <form [formGroup]="registroForm" (ngSubmit)="onSubmit()" class="registro-form">
+      
+      <div class="form-group">
+        <label>Nombre de Usuario</label>
+        <input type="text" formControlName="usuario" placeholder="Usuario">
+        @if (registroForm.get('usuario')?.invalid && registroForm.get('usuario')?.touched) {
+          <small class="text-error">El nombre de usuario es obligatorio.</small>
+        }
+      </div>
+
+      <div class="form-group">
+        <label>Correo electrónico</label>
+        <input type="email" formControlName="email" placeholder="Correo">
+        
+        @if (registroForm.get('email')?.errors?.['required'] && registroForm.get('email')?.touched) {
+          <small class="text-error">El correo es obligatorio.</small>
+        }
+        @if (registroForm.get('email')?.errors?.['email'] && registroForm.get('email')?.touched) {
+          <small class="text-error">El correo no es válido.</small>
+        }
+      </div>
+
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" formControlName="password" placeholder="Contraseña">
+        @if (registroForm.get('password')?.errors?.['required'] && registroForm.get('password')?.touched) {
+          <small class="text-error">La contraseña es obligatoria.</small>
+        }
+        @if (registroForm.get('password')?.errors?.['pattern'] && registroForm.get('password')?.touched) {
+          <small class="text-error">Debe contener al menos 5 caracteres, una letra y un número.</small>
+        }
+      </div>
+
+      <div class="form-group">
+        <label>Confirmar contraseña</label>
+        <input type="password" formControlName="confirmarPassword" placeholder="Confirmar contraseña">
+        @if (registroForm.errors?.['mismatch'] && registroForm.get('confirmarPassword')?.touched) {
+          <small class="text-error">Las contraseñas no coinciden.</small>
+        }
+      </div>
+
+      <div class="form-group">
+        <label>Número de teléfono</label>
+        <input type="text" formControlName="telefono" placeholder="Teléfono"
+          maxlength="10">
+        @if (registroForm.get('telefono')?.invalid && registroForm.get('telefono')?.touched) {
+          <small class="text-error">El número de teléfono es obligatorio.</small>
+        }
+        @if (registroForm.get('telefono')?.errors?.['pattern'] && registroForm.get('telefono')?.touched) {
+          <small class="text-error">
+            Ingresa un número válido de 10 dígitos.
+          </small>
+        }
+      </div>
+
+      <button type="submit" class="btn btn-primary mt-3" [disabled]="registroForm.invalid">Registrarme</button>
+      <p class="text-center mt-2">¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a></p>
+    </form>
+    }
+  </div>
+</div>
