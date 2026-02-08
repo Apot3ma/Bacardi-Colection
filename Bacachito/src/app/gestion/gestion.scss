@@ -1,0 +1,91 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f4f7f6; /* Color de fondo ligero */
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Estilos de la Barra Lateral */
+.sidebar {
+    width: 260px;
+    background-color: #1a1c23; /* Gris oscuro profundo */
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 40px;
+    color: #4ed9d9; /* Color acento */
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.menu-item {
+    background: none;
+    border: none;
+    color: #a0aec0;
+    padding: 15px 25px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    width: 100%;
+}
+
+.menu-item span {
+    margin-right: 15px;
+}
+
+.menu-item p {
+    font-size: 16px;
+}
+
+/* Efectos Hover y Activo */
+.menu-item:hover, .menu-item.active {
+    background-color: #2d3748;
+    color: #4ed9d9;
+    border-left: 4px solid #4ed9d9;
+}
+
+/* Estilo del Área Principal */
+.main-content {
+    flex-grow: 1; /* Toma todo el espacio restante */
+    background-color: #ffffff; /* Fondo blanco solicitado */
+    padding: 40px;
+    overflow-y: auto;
+}
+
+header h1 {
+    color: #2d3748;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #edf2f7;
+    padding-bottom: 10px;
+}
+
+.canvas-area {
+    border: 2px dashed #cbd5e0; /* Un borde sutil para ver el área */
+    height: 80%;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #a0aec0;
+}
