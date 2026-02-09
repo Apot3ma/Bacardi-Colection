@@ -5,19 +5,30 @@
         </div>
 
         <nav class="menu">
-            <button class="menu-item active">
+            <button class="menu-item" 
+                    [class.active]="currentSection === 'dashboard'" 
+                    (click)="setSection('dashboard')">
                 <span class="material-icons">dashboard</span>
                 <p>Dashboard</p>
             </button>
-            <button class="menu-item">
+
+            <button class="menu-item" 
+                    [class.active]="currentSection === 'requerimientos'"
+                    (click)="setSection('requerimientos')">
                 <span class="material-icons">assignment</span>
                 <p>Requerimientos</p>
             </button>
-            <button class="menu-item">
+
+            <button class="menu-item" 
+                    [class.active]="currentSection === 'recursos'"
+                    (click)="setSection('recursos')">
                 <span class="material-icons">folder</span>
                 <p>Recursos</p>
             </button>
-            <button class="menu-item">
+
+            <button class="menu-item" 
+                    [class.active]="currentSection === 'configuracion'"
+                    (click)="setSection('configuracion')">
                 <span class="material-icons">settings</span>
                 <p>Configuración</p>
             </button>
@@ -26,11 +37,14 @@
 
     <main class="main-content">
         <header>
-            <h1>Panel Principal</h1>
+            <h1>{{ currentSection === 'dashboard' ? 'Panel Principal' : 
+                   currentSection === 'recursos' ? 'Gestión de Recursos' : 
+                   'Sección en construcción' }}</h1>
         </header>
 
         <section class="canvas-area">
-            <div class="dashboard-grid">
+            
+            <div class="dashboard-grid" *ngIf="currentSection === 'dashboard'">
                 <div class="stats-column">
                     <div class="stat-card">
                         <h3>Requerimientos Completos</h3>
@@ -50,7 +64,7 @@
                         </div>
                     </div>
                 </div>
-
+        
                 <div class="documents-column">
                     <h3>Documentos recientes</h3>
                     <div class="docs-grid">
@@ -66,7 +80,7 @@
                         </div>
                         <div class="doc-item">
                             <span class="material-icons">description</span>
-                            <p>Manual_Usuario.docx</p>
+                            <p>Manual.docx</p>
                             <span class="file-type">DOCX</span>
                         </div>
                         <div class="doc-item">
@@ -77,6 +91,64 @@
                     </div>
                 </div>
             </div>
+
+            <div class="resources-layout" *ngIf="currentSection === 'recursos'">
+                <aside class="months-panel">
+                    <h3 class="panel-title">Historial 2026</h3>
+                    <ul class="month-list">
+                        <li class="month-item">Enero</li>
+                        <li class="month-item">Febrero</li>
+                        <li class="month-item">Marzo</li>
+                        <li class="month-item active">
+                            <span class="month-name">Abril</span>
+                            <ul class="sub-list">
+                                <li>Entregables</li>
+                                <li>Código fuente</li>
+                                <li>Assets</li>
+                            </ul>
+                        </li>
+                        <li class="month-item">Mayo</li>
+                    </ul>
+                </aside>
+
+                <div class="resources-content">
+                    <div class="resources-header">
+                        <h2>Recursos de Abril</h2>
+                        <button class="btn-add">
+                            <span class="material-icons">add</span>
+                            Añadir recurso
+                        </button>
+                    </div>
+
+                    <div class="docs-grid">
+                        <div class="doc-item">
+                            <span class="material-icons">folder_zip</span>
+                            <p>Proyecto_Final.zip</p>
+                            <span class="file-type">ZIP</span>
+                        </div>
+                        <div class="doc-item">
+                            <span class="material-icons">picture_as_pdf</span>
+                            <p>Reporte_Abril.pdf</p>
+                            <span class="file-type">PDF</span>
+                        </div>
+                        <div class="doc-item">
+                            <span class="material-icons">image</span>
+                            <p>Evidencia_01.jpg</p>
+                            <span class="file-type">JPG</span>
+                        </div>
+                        <div class="doc-item placeholder-item">
+                            <span class="material-icons">more_horiz</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="currentSection !== 'dashboard' && currentSection !== 'recursos'" 
+                 style="text-align: center; padding-top: 50px;">
+                <span class="material-icons" style="font-size: 48px; color: #cbd5e0;">construction</span>
+                <p style="color: #a0aec0; margin-top: 10px;">Esta sección está en desarrollo.</p>
+            </div>
+
         </section>
     </main>
 </div>
