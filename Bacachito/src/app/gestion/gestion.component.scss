@@ -1,4 +1,3 @@
-/* Reset básico */
 * {
     margin: 0;
     padding: 0;
@@ -6,8 +5,18 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    display: inline-block;
+    vertical-align: middle;
+}
+
 body {
-    background-color: #f4f7f6; /* Color de fondo ligero */
+    background-color: #f4f7f6; 
 }
 
 .container {
@@ -15,10 +24,9 @@ body {
     height: 100vh;
 }
 
-/* Estilos de la Barra Lateral */
 .sidebar {
     width: 260px;
-    background-color: #1a1c23; /* Gris oscuro profundo */
+    background-color: #1a1c23; 
     color: white;
     display: flex;
     flex-direction: column;
@@ -28,7 +36,7 @@ body {
 .logo {
     text-align: center;
     margin-bottom: 40px;
-    color: #4ed9d9; /* Color acento */
+    color: #4ed9d9; 
 }
 
 .menu {
@@ -58,17 +66,15 @@ body {
     font-size: 16px;
 }
 
-/* Efectos Hover y Activo */
 .menu-item:hover, .menu-item.active {
     background-color: #2d3748;
     color: #4ed9d9;
     border-left: 4px solid #4ed9d9;
 }
 
-/* Estilo del Área Principal */
 .main-content {
-    flex-grow: 1; /* Toma todo el espacio restante */
-    background-color: #ffffff; /* Fondo blanco solicitado */
+    flex-grow: 1; 
+    background-color: #ffffff; 
     padding: 40px;
     overflow-y: auto;
 }
@@ -81,7 +87,7 @@ header h1 {
 }
 
 .canvas-area {
-    border: 2px dashed #cbd5e0; /* Un borde sutil para ver el área */
+    border: 2px dashed #cbd5e0; 
     height: 80%;
     border-radius: 8px;
     display: flex;

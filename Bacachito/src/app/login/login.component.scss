@@ -1,0 +1,132 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.login-page {
+    background-color: #f4f7f6;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    border-top: 5px solid #1a1c23;
+}
+
+.login-header h2 {
+    color: #2d3748;
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.login-header p {
+    color: #a0aec0;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+input {
+    padding: 12px 15px;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: #4ed9d9; 
+    box-shadow: 0 0 0 3px rgba(78, 217, 217, 0.2);
+}
+
+input.is-invalid {
+    border-color: #e53e3e;
+}
+
+.text-error {
+    color: #e53e3e;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+
+.btn-primary {
+    background-color: #1a1c23;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: #2d3748;
+    color: #4ed9d9;
+}
+
+.btn-primary:disabled {
+    background-color: #cbd5e0;
+    cursor: not-allowed;
+}
+
+.btn-primary[routerLink="/landingpage"] {
+    background-color: transparent;
+    border: 1px solid #cbd5e0;
+    color: #718096;
+}
+
+.btn-primary[routerLink="/landingpage"]:hover {
+    background-color: #f7fafc;
+    border-color: #a0aec0;
+}
+
+a {
+    color: #4ed9d9;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.text-center { text-align: center; }
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 1rem; }
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

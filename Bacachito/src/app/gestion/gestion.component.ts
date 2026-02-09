@@ -4,9 +4,9 @@ import { Component } from '@angular/core';
   selector: 'app-gestion',
   standalone: true, 
   imports: [],
-  templateUrl: './gestion.html',
-  styleUrl: './gestion.scss' 
+  templateUrl: './gestion.component.html',
+  styleUrl: './gestion.component.scss' 
 })
-export class Gestion {
+export class GestionComponent {
 
 }
