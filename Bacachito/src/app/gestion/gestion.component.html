@@ -27,10 +27,10 @@
             </button>
 
             <button class="menu-item" 
-                    [class.active]="currentSection === 'configuracion'"
-                    (click)="setSection('configuracion')">
-                <span class="material-icons">settings</span>
-                <p>Configuración</p>
+                    [class.active]="currentSection === 'equipo'"
+                    (click)="setSection('equipo')">
+                <span class="material-icons">group</span>
+                <p>Equipo</p>
             </button>
         </nav>
     </aside>
@@ -143,7 +143,77 @@
                 </div>
             </div>
 
-            <div *ngIf="currentSection !== 'dashboard' && currentSection !== 'recursos'" 
+            <div class="resources-layout" *ngIf="currentSection === 'equipo'">
+                <aside class="months-panel">
+                    <h3 class="panel-title">Roles Asignados</h3>
+                    <ul class="month-list">
+                        <li class="month-item">
+                            <div class="role-info">
+                                <span>Project Manager</span>
+                                <span class="role-count"> 1/1</span>
+                            </div>
+                        </li>
+                        <li class="month-item active">
+                            <div class="role-info">
+                                <span>Front</span>
+                                <span class="role-count"> 3/4</span>
+                            </div>
+                        </li>
+                        <li class="month-item">
+                            <div class="role-info">
+                                <span>Back</span>
+                                <span class="role-count"> 2/2</span>
+                            </div>
+                        </li>
+                        <li class="month-item">
+                            <div class="role-info">
+                                <span>Diseñador Interfaz</span>
+                                <span class="role-count"> 0/1</span>
+                            </div>
+                        </li>
+                        <li class="month-item">
+                            <div class="role-info">
+                                <span>Stackholder</span>
+                                <span class="role-count"> 0/1</span>
+                            </div>
+                        </li>
+                    </ul>
+                </aside>
+
+                <div class="resources-content">
+                    <div class="resources-header">
+                        <h2>Miembros: Front</h2>
+                        <button class="btn-add">
+                            <span class="material-icons">person_add</span>
+                            Crear nuevo
+                        </button>
+                    </div>
+
+                    <div class="docs-grid">
+                        <div class="doc-item">
+                            <span class="material-icons">face</span>
+                            <p>Gael Valenzuela</p>
+                            <span class="file-type">SENIOR</span>
+                        </div>
+                        <div class="doc-item">
+                            <span class="material-icons">face_6</span>
+                            <p>¿¿¿FILIBERTO???</p>
+                            <span class="file-type">JUNIOR</span>
+                        </div>
+                        <div class="doc-item">
+                            <span class="material-icons">face_3</span>
+                            <p>Alan Angulo 🤣🤣</p>
+                            <span class="file-type">JUNIOR</span>
+                        </div>
+                        <div class="doc-item placeholder-item">
+                            <span class="material-icons">add</span>
+                            <span class="file-type" style="margin-top: 5px;">Asignar</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <div *ngIf="currentSection !== 'dashboard' && currentSection !== 'recursos' && currentSection !== 'equipo'"
                  style="text-align: center; padding-top: 50px;">
                 <span class="material-icons" style="font-size: 48px; color: #cbd5e0;">construction</span>
                 <p style="color: #a0aec0; margin-top: 10px;">Esta sección está en desarrollo.</p>
