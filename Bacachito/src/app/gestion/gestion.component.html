@@ -16,7 +16,7 @@
                     [class.active]="currentSection === 'requerimientos'"
                     (click)="setSection('requerimientos')">
                 <span class="material-icons">assignment</span>
-                <p>Requerimientos</p>
+                <p>Equipo</p>
             </button>
 
             <button class="menu-item" 
@@ -38,7 +38,8 @@
     <main class="main-content">
         <header>
             <h1>{{ currentSection === 'dashboard' ? 'Panel Principal' : 
-                   currentSection === 'recursos' ? 'Gestión de Recursos' : 
+                   currentSection === 'recursos' ? 'Gestión de Recursos' :
+                   currentSection === 'requerimientos' ? 'Gestión de Equipo' : 
                    'Sección en construcción' }}</h1>
         </header>
 
@@ -143,7 +144,79 @@
                 </div>
             </div>
 
-            <div *ngIf="currentSection !== 'dashboard' && currentSection !== 'recursos'" 
+            <div class="team-layout" *ngIf="currentSection === 'requerimientos'">
+                <div class="form-section">
+                    <h2>Añadir Miembro al Equipo</h2>
+                    
+                    <form (ngSubmit)="addTeamMember()" class="team-form">
+                        <div class="form-group">
+                            <label for="nombre">Nombre del Miembro</label>
+                            <input 
+                                type="text" 
+                                id="nombre" 
+                                [(ngModel)]="newMember.nombre"
+                                name="nombre"
+                                placeholder="Ingrese el nombre completo"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rol">Rol en el Equipo</label>
+                            <select 
+                                id="rol" 
+                                [(ngModel)]="newMember.rol"
+                                name="rol"
+                                required>
+                                <option value="">Seleccione un rol</option>
+                                <option *ngFor="let rol of rolesDisponibles" [value]="rol">
+                                    {{ rol }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <span class="material-icons">person_add</span>
+                            Añadir Miembro
+                        </button>
+                    </form>
+                </div>
+
+                <div class="members-section">
+                    <h2>Miembros del Equipo ({{ teamMembers.length }})</h2>
+                    
+                    <div *ngIf="teamMembers.length === 0" class="no-members">
+                        <span class="material-icons">group</span>
+                        <p>No hay miembros aún. Añade tu primer miembro usando el formulario.</p>
+                    </div>
+
+                    <div *ngIf="teamMembers.length > 0" class="members-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Rol</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let member of teamMembers; let i = index">
+                                    <td class="id-cell">{{ member.id }}</td>
+                                    <td>{{ member.nombre }}</td>
+                                    <td><span class="role-badge">{{ member.rol }}</span></td>
+                                    <td>
+                                        <button class="btn-delete" (click)="removeMember(i)" title="Eliminar miembro">
+                                            <span class="material-icons">delete</span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="currentSection !== 'dashboard' && currentSection !== 'recursos' && currentSection !== 'requerimientos'" 
                  style="text-align: center; padding-top: 50px;">
                 <span class="material-icons" style="font-size: 48px; color: #cbd5e0;">construction</span>
                 <p style="color: #a0aec0; margin-top: 10px;">Esta sección está en desarrollo.</p>
