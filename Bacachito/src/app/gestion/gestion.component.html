@@ -55,7 +55,7 @@
             <div class="projects-view" *ngIf="currentSection === 'home'">
                 <div class="resources-header">
                     <h2>Mis Proyectos</h2>
-                    <button class="btn-add">
+                    <button class="btn-add" (click)="openModal()">
                         <span class="material-icons">add</span>
                         Nuevo Proyecto
                     </button>
@@ -110,6 +110,43 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="modal-overlay" *ngIf="showModal">
+                    <div class="modal-container">
+                        <div class="modal-header">
+                            <h3>Nuevo Proyecto</h3>
+                            <button class="btn-close" (click)="closeModal()">
+                                <span class="material-icons">close</span>
+                            </button>
+                        </div>
+                        
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Nombre del Proyecto</label>
+                                <input type="text">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Descripción</label>
+                                <textarea rows="3" ></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Líder del Proyecto (PM)</label>
+                                <div class="input-with-icon">
+                                    <span class="material-icons">person</span>
+                                    <input type="text" placeholder="Nombre del responsable">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+                            <button class="btn-save" (click)="closeModal()">Crear Proyecto</button>
+                        </div>
+                    </div>
+                </div>
+                
             </div>
             
             <div class="dashboard-grid" *ngIf="currentSection === 'dashboard'">

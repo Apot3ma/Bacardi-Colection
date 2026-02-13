@@ -10,8 +10,17 @@ import { CommonModule } from '@angular/common';
 })
 export class GestionComponent {
   currentSection: string = 'home';
+  showModal: boolean = false;
 
   setSection(section: string) {
     this.currentSection = section;
+  }
+
+  openModal() {
+    this.showModal = true;
+  }
+
+  closeModal() {
+    this.showModal = false;
   }
 }
