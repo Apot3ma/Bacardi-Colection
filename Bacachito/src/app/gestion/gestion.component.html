@@ -5,6 +5,14 @@
         </div>
 
         <nav class="menu">
+
+            <button class="menu-item" 
+                    [class.active]="currentSection === 'home'" 
+                    (click)="setSection('home')">
+                <span class="material-icons">home</span>
+                <p>Inicio</p>
+            </button>
+
             <button class="menu-item" 
                     [class.active]="currentSection === 'dashboard'" 
                     (click)="setSection('dashboard')">
@@ -43,6 +51,66 @@
         </header>
 
         <section class="canvas-area">
+
+            <div class="projects-view" *ngIf="currentSection === 'home'">
+                <div class="resources-header">
+                    <h2>Mis Proyectos</h2>
+                    <button class="btn-add">
+                        <span class="material-icons">add</span>
+                        Nuevo Proyecto
+                    </button>
+                </div>
+
+                <div class="projects-grid">
+                    <div class="project-card active-project" (click)="setSection('dashboard')">
+                        <div class="card-content">
+                            <h3>BCH</h3>
+                            <p class="project-desc">Sistema de gestión bancaria y recursos internos.</p>
+                        </div>
+                        
+                        <div class="project-footer">
+                            <div class="sprint-info">
+                                <span>Progreso</span>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar" style="width: 75%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-card">
+                        <div class="card-content">
+                            <h3>E-Commerce Web</h3>
+                            <p class="project-desc">Plataforma de ventas online para retail.</p>
+                        </div>
+                        
+                        <div class="project-footer">
+                            <div class="sprint-info">
+                                <span>Progreso</span>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar" style="width: 30%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-card">
+                        <div class="card-content">
+                            <h3>App Móvil V2</h3>
+                            <p class="project-desc">Rediseño de la aplicación nativa iOS/Android.</p>
+                        </div>
+                        
+                        <div class="project-footer">
+                            <div class="sprint-info">
+                                <span>Progreso</span>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar" style="width: 100%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
             <div class="dashboard-grid" *ngIf="currentSection === 'dashboard'">
                 <div class="stats-column">
@@ -213,7 +281,7 @@
                 </div>
             </div>
 
-        <div *ngIf="currentSection !== 'dashboard' && currentSection !== 'recursos' && currentSection !== 'equipo'"
+        <div *ngIf="currentSection !== 'dashboard' && currentSection !== 'recursos' && currentSection !== 'equipo' && currentSection !== 'home'"
                  style="text-align: center; padding-top: 50px;">
                 <span class="material-icons" style="font-size: 48px; color: #cbd5e0;">construction</span>
                 <p style="color: #a0aec0; margin-top: 10px;">Esta sección está en desarrollo.</p>

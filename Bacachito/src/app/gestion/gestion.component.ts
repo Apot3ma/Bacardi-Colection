@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './gestion.component.scss' 
 })
 export class GestionComponent {
-  currentSection: string = 'dashboard';
+  currentSection: string = 'home';
 
   setSection(section: string) {
     this.currentSection = section;
