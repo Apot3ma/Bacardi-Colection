@@ -9,9 +9,18 @@ import { CommonModule } from '@angular/common';
   styleUrl: './gestion.component.scss' 
 })
 export class GestionComponent {
-  currentSection: string = 'dashboard';
+  currentSection: string = 'home';
+  showModal: boolean = false;
 
   setSection(section: string) {
     this.currentSection = section;
+  }
+
+  openModal() {
+    this.showModal = true;
+  }
+
+  closeModal() {
+    this.showModal = false;
   }
 }
