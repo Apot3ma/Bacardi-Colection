@@ -21,10 +21,10 @@
             </button>
 
             <button class="menu-item" 
-                    [class.active]="currentSection === 'requerimientos'"
-                    (click)="setSection('requerimientos')">
+                    [class.active]="currentSection === 'procesos'"
+                    (click)="setSection('procesos')">
                 <span class="material-icons">assignment</span>
-                <p>Requerimientos</p>
+                <p>Procesos</p>
             </button>
 
             <button class="menu-item" 
@@ -45,8 +45,11 @@
 
     <main class="main-content">
         <header>
-            <h1>{{ currentSection === 'dashboard' ? 'Panel Principal' : 
+            <h1>{{ currentSection === 'dashboard' ? 'Dashboard del Proyecto' : 
+                   currentSection === 'procesos' ? 'Ingeniería de Requisitos' :
                    currentSection === 'recursos' ? 'Gestión de Recursos' : 
+                   currentSection === 'equipo' ? 'Gestión de Equipo' :
+                   currentSection === 'home' ? 'Mis Proyectos' :
                    'Sección en construcción' }}</h1>
         </header>
 
@@ -111,7 +114,7 @@
                     </div>
                 </div>
 
-                <div class="modal-overlay" *ngIf="showModal">
+                <div class="modal-overlay" *ngIf="showModalNewProject">
                     <div class="modal-container">
                         <div class="modal-header">
                             <h3>Nuevo Proyecto</h3>
@@ -152,7 +155,7 @@
             <div class="dashboard-grid" *ngIf="currentSection === 'dashboard'">
                 <div class="stats-column">
                     <div class="stat-card">
-                        <h3>Requerimientos Completos</h3>
+                        <h3>Procesos Completos</h3>
                         <div class="progress-circle">
                             <svg viewBox="0 0 36 36" class="circular-chart">
                                 <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
@@ -195,6 +198,143 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="resources-layout" *ngIf="currentSection === 'procesos'">
+                
+                <aside class="months-panel">
+                    <h3 class="panel-title">Técnicas</h3>
+                    <ul class="month-list">
+                        <li class="month-item" 
+                            [class.active]="currentProcessTab === 'entrevistas'"
+                            (click)="setProcessTab('entrevistas')">
+                            <span class="month-name">Entrevistas</span>
+                        </li>
+                        <li class="month-item"
+                            [class.active]="currentProcessTab === 'cuestionarios'"
+                            (click)="setProcessTab('cuestionarios')">
+                            <span class="month-name">Cuestionarios</span>
+                        </li>
+                        <li class="month-item" style="opacity: 0.5; cursor: not-allowed;">
+                            <span class="month-name">Observación</span>
+                        </li>
+                    </ul>
+                </aside>
+
+                <div class="resources-content" *ngIf="currentProcessTab === 'entrevistas'">
+                    <div class="resources-header">
+                        <h2>Registro de Entrevistas</h2>
+                        <button class="btn-add" (click)="openInterviewModal()">
+                            <span class="material-icons">add_comment</span>
+                            Nueva Entrevista
+                        </button>
+                    </div>
+
+                    <div class="docs-grid">
+                        <div class="doc-item">
+                            <span class="material-icons">record_voice_over</span>
+                            <p>Stakeholder Principal</p>
+                        </div>
+                        <div class="doc-item">
+                            <span class="material-icons">record_voice_over</span>
+                            <p>Gerente</p>
+                        </div>
+                        <div class="doc-item">
+                            <span class="material-icons">groups</span>
+                            <p>Grupo 1</p>
+                        </div>
+                    </div>
+
+                    <div class="modal-overlay" *ngIf="showInterviewModal">
+                        <div class="modal-container interview-modal"> <div class="modal-header">
+                                <h3>Planificar Entrevista</h3>
+                                <button class="btn-close" (click)="closeModal()">
+                                    <span class="material-icons">close</span>
+                                </button>
+                            </div>
+                            
+                            <div class="modal-body scrollable-body">
+                                <div class="form-row">
+                                    <div class="form-group half">
+                                        <label>Título</label>
+                                        <input type="text" [(ngModel)]="newInterview.title">
+                                    </div>
+                                    <div class="form-group half">
+                                        <label>Entrevistado</label>
+                                        <input type="text" [(ngModel)]="newInterview.interviewee">
+                                    </div>
+                                </div>
+
+                                <hr class="divider">
+
+                                <div class="sections-container">
+                                    <label class="section-label">Preguntas</label>
+                                    
+                                    <div class="question-section" *ngFor="let section of newInterview.sections; let i = index;">
+                                        <div class="section-header">
+                                            <input type="text" 
+                                                   class="section-title-input" 
+                                                   placeholder="Nombre de la Sección"
+                                                   [(ngModel)]="section.title">
+                                            <button class="btn-icon-danger" (click)="removeSection(i)" *ngIf="newInterview.sections.length > 1" title="Eliminar Sección">
+                                                <span class="material-icons">delete</span>
+                                            </button>
+                                        </div>
+
+                                        <div class="questions-list">
+                                            <div class="question-item" *ngFor="let q of section.questions; let j = index;">
+                                                <span class="q-number">{{j + 1}}.</span>
+                                                <input type="text" 
+                                                       class="question-input" 
+                                                       [(ngModel)]="section.questions[j]"> <button class="btn-icon-small" (click)="removeQuestion(i, j)" *ngIf="section.questions.length > 1">
+                                                    <span class="material-icons">close</span>
+                                                </button>
+                                            </div>
+                                            
+                                            <button class="btn-text-add" (click)="addQuestion(i)">
+                                                + Agregar pregunta
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <button class="btn-dashed-add" (click)="addSection()">
+                                        <span class="material-icons">library_add</span>
+                                        + Agregar Nueva Sección
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+                                <button class="btn-save" (click)="closeModal()">Guardar preguntas</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resources-content" *ngIf="currentProcessTab === 'cuestionarios'">
+                    <div class="resources-header">
+                        <h2>Cuestionarios y Encuestas</h2>
+                        <button class="btn-add">
+                            <span class="material-icons">playlist_add</span>
+                            Nuevo Formulario
+                        </button>
+                    </div>
+
+                    <div class="docs-grid">
+                        <div class="doc-item">
+                            <span class="material-icons">assignment</span>
+                            <p>Encuesta 1</p>
+                            <span class="file-type">Google Forms</span>
+                        </div>
+                        <div class="doc-item">
+                            <span class="material-icons">checklist</span>
+                            <p>Encuesta 2</p>
+                            <span class="file-type">Interno</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <div class="resources-layout" *ngIf="currentSection === 'recursos'">
@@ -318,7 +458,8 @@
                 </div>
             </div>
 
-        <div *ngIf="currentSection !== 'dashboard' && currentSection !== 'recursos' && currentSection !== 'equipo' && currentSection !== 'home'"
+        <div *ngIf="currentSection !== 'dashboard' && currentSection !== 'recursos' && currentSection !== 'equipo' 
+        && currentSection !== 'home' && currentSection !== 'procesos'"
                  style="text-align: center; padding-top: 50px;">
                 <span class="material-icons" style="font-size: 48px; color: #cbd5e0;">construction</span>
                 <p style="color: #a0aec0; margin-top: 10px;">Esta sección está en desarrollo.</p>
