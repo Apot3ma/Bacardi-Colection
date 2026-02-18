@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import mysql from 'mysql2/promise';
+import dbconfig from './Conexion.js';
 
 
 const app = express();
@@ -35,7 +36,7 @@ async function start() {
             console.log('Active on port 3000');
         });
         //modulos para agregar
-        
+
     } catch (err) {
         console.error('Failed to connect to MySQL', err);
         process.exit(1);
