@@ -282,7 +282,7 @@
                                         </div>
 
                                         <div class="questions-list">
-                                            <div class="question-item" *ngFor="let q of section.questions; let j = index;">
+                                            <div class="question-item" *ngFor="let q of section.questions; let j = index; trackBy: trackByIndex">
                                                 <span class="q-number">{{j + 1}}.</span>
                                                 <input type="text" 
                                                        class="question-input" 
@@ -315,7 +315,7 @@
                 <div class="resources-content" *ngIf="currentProcessTab === 'cuestionarios'">
                     <div class="resources-header">
                         <h2>Cuestionarios y Encuestas</h2>
-                        <button class="btn-add">
+                        <button class="btn-add" (click)="openQuestionnaireModal()">
                             <span class="material-icons">playlist_add</span>
                             Nuevo Formulario
                         </button>
@@ -333,6 +333,98 @@
                             <span class="file-type">Interno</span>
                         </div>
                     </div>
+
+                    <div class="modal-overlay" *ngIf="showQuestionModal">
+                        <div class="modal-container interview-modal"> <div class="modal-header">
+                                <h3>Diseñar Cuestionario</h3>
+                                <button class="btn-close" (click)="closeModal()">
+                                    <span class="material-icons">close</span>
+                                </button>
+                            </div>
+                            
+                            <div class="modal-body scrollable-body">
+                                <div class="form-group">
+                                    <label>Título del Cuestionario</label>
+                                    <input type="text" [(ngModel)]="newQuestion.title">
+                                </div>
+                                <div class="form-group">
+                                    <label>Descripción / Objetivo</label>
+                                    <textarea rows="2" [(ngModel)]="newQuestion.description"></textarea>
+                                </div>
+
+                                <hr class="divider">
+
+                                <div class="sections-container">
+                                    <label class="section-label">Preguntas</label>
+                                    
+                                    <div class="question-card" *ngFor="let q of newQuestion.questions; let i = index; trackBy: trackByIndex">
+                                        
+                                        <div class="q-header-row">
+                                            <div class="q-number-circle">{{i + 1}}</div>
+                                            <input type="text" 
+                                                   class="question-main-input" 
+                                                   placeholder="Pregunta aquí" 
+                                                   [(ngModel)]="q.text">
+                                            
+                                            <select class="type-select" [(ngModel)]="q.type">
+                                                <option value="open">Abierta</option>
+                                                <option value="closed">Si / No</option>
+                                                <option value="multiple">Opción Múltiple</option>
+                                            </select>
+
+                                            <button class="btn-icon-danger" (click)="removeQuestionnaireQuestion(i)" title="Borrar pregunta">
+                                                <span class="material-icons">delete</span>
+                                            </button>
+                                        </div>
+
+                                        <div class="q-preview-area">
+                                            
+                                            <div *ngIf="q.type === 'open'" class="preview-open">
+                                                <input type="text" disabled placeholder="El usuario escribirá su respuesta aquí...">
+                                            </div>
+
+                                            <div *ngIf="q.type === 'closed'" class="preview-closed">
+                                                <div class="radio-option">
+                                                    <div class="fake-radio"></div> <span>Sí</span>
+                                                </div>
+                                                <div class="radio-option">
+                                                    <div class="fake-radio"></div> <span>No</span>
+                                                </div>
+                                            </div>
+
+                                            <div *ngIf="q.type === 'multiple'" class="options-editor">
+                                                <div class="option-row" *ngFor="let opt of q.options; let j = index; trackBy: trackByIndex">
+                                                    <div class="fake-circle"></div>
+                                                    <input type="text" 
+                                                           class="option-input" 
+                                                           placeholder="Opción {{j + 1}}" 
+                                                           [(ngModel)]="q.options[j]">
+                                                    <button class="btn-icon-small" (click)="removeOption(i, j)">
+                                                        <span class="material-icons">close</span>
+                                                    </button>
+                                                </div>
+                                                <button class="btn-text-add small" (click)="addOption(i)">
+                                                    + Añadir opción
+                                                </button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <button class="btn-dashed-add" (click)="addQuestionQuestion()">
+                                        <span class="material-icons">add_circle</span>
+                                        Agregar Nueva Pregunta
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+                                <button class="btn-save" (click)="closeModal()">Guardar Cuestionario</button>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
             </div>

@@ -14,8 +14,13 @@ export class GestionComponent {
   currentProcessTab: string = 'entrevistas';
   showModalNewProject: boolean = false;
   showInterviewModal: boolean = false;
+  showQuestionModal: boolean = false;
 
-  //plantilla entrevista para hardcoded
+  /*
+    **
+    plantilla entrevista para hardcoded
+    **
+  */
   newInterview = {
     title: '',
     interviewee: '',
@@ -27,7 +32,28 @@ export class GestionComponent {
     ]
   };
 
-  // cambio de secciones de gestión
+  /*
+    **
+    plantilla cuestionario para hardcoded
+    **
+  */
+  newQuestion = {
+    title: '',
+    description: '',
+    questions: [
+      {
+        text: '',
+        type: 'a', // <-- 'a', 'c' o 'm' 
+        options: ['Opción 1', 'Opción 2'] 
+      }
+    ]
+  };
+
+  /* 
+    ** 
+    cambio de secciones de gestión
+    **
+  */
   setSection(section: string) {
     this.currentSection = section;
   }
@@ -36,19 +62,28 @@ export class GestionComponent {
     this.currentProcessTab = tab;
   }
 
- // abrir y cerrar modales
+  /* 
+    **
+    abrir y cerrar modales 
+    **
+  */
   openModal() {
     this.showModalNewProject = true;
   }
 
+
   openInterviewModal() {
     this.showInterviewModal = true;
+  }
+  
+  openQuestionnaireModal() {
+    this.showQuestionModal = true;
   }
 
   closeModal() {
     this.showModalNewProject = false;
     this.showInterviewModal = false;
-
+    this.showQuestionModal = false;
     this.newInterview =  {
       title: '',
       interviewee: '',
@@ -62,11 +97,13 @@ export class GestionComponent {
 
   }
 
-  /* funciones para la entrevista 
-   - agregar seccion
-   - eliminar seccion
-   - agregar pregunta
-   - eliminar pregunta
+  /* 
+    ** funciones para la entrevista 
+      - agregar seccion
+      - eliminar seccion
+      - agregar pregunta
+      - eliminar pregunta
+    **
   */ 
   addSection() {
     this.newInterview.sections.push({
@@ -89,6 +126,49 @@ export class GestionComponent {
     const questions = this.newInterview.sections[sectionIndex].questions;
     if (questions.length > 1) {
       questions.splice(questionIndex, 1);
+    }
+  }
+
+  /* 
+    **
+    esta función ayuda a entrevistas a poder escribir en los recuadros de preguntas de entrevista 
+    **
+  */
+  trackByIndex(index: number, obj: any): any {
+    return index;
+  }
+
+  /* 
+    **
+    funciones para cuestionario
+    - agregar pregunta
+    - eliminar pregunta
+    - agregar opción (opcion multiple)
+    - eliminar opción (opcion multiple)
+    **
+  */
+  addQuestionQuestion() {
+    this.newQuestion.questions.push({
+      text: '',
+      type: 'a',
+      options: ['Opción 1']
+    });
+  }
+
+  removeQuestionnaireQuestion(index: number) {
+    if (this.newQuestion.questions.length > 1) {
+      this.newQuestion.questions.splice(index, 1);
+    }
+  }
+
+  addOption(questionIndex: number) {
+    this.newQuestion.questions[questionIndex].options.push('');
+  }
+
+  removeOption(questionIndex: number, optionIndex: number) {
+    const options = this.newQuestion.questions[questionIndex].options;
+    if (options.length > 1) {
+      options.splice(optionIndex, 1);
     }
   }
 }
