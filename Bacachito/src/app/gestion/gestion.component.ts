@@ -15,6 +15,7 @@ export class GestionComponent {
   showModalNewProject: boolean = false;
   showInterviewModal: boolean = false;
   showQuestionModal: boolean = false;
+  showObservationModal: boolean = false;
 
   /*
     **
@@ -49,6 +50,12 @@ export class GestionComponent {
     ]
   };
 
+  newObservation = {
+    context: '', 
+    date: new Date().toISOString().split('T')[0], 
+    notes: [''] 
+  };
+
   /* 
     ** 
     cambio de secciones de gestión
@@ -80,10 +87,16 @@ export class GestionComponent {
     this.showQuestionModal = true;
   }
 
+  openObservationModal() {
+    this.showObservationModal = true;
+  }
+
   closeModal() {
     this.showModalNewProject = false;
     this.showInterviewModal = false;
     this.showQuestionModal = false;
+    this.showObservationModal = false;
+
     this.newInterview =  {
       title: '',
       interviewee: '',
@@ -93,6 +106,12 @@ export class GestionComponent {
           questions: [''] 
         }
       ]
+    };
+
+    this.newObservation = {
+      context: '', 
+      date: new Date().toISOString().split('T')[0], 
+      notes: [''] 
     };
 
   }
@@ -171,4 +190,22 @@ export class GestionComponent {
       options.splice(optionIndex, 1);
     }
   }
+
+  /* 
+    **
+    Funciones para observación
+    - agregar nota
+    - eliminar nota
+    **
+  */
+  addObservationNote() {
+    this.newObservation.notes.push('');
+  }
+
+  removeObservationNote(index: number) {
+    if (this.newObservation.notes.length > 1) {
+      this.newObservation.notes.splice(index, 1);
+    }
+  }
+
 }
