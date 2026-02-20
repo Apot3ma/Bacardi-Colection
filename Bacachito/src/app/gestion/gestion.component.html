@@ -215,8 +215,14 @@
                             (click)="setProcessTab('cuestionarios')">
                             <span class="month-name">Cuestionarios</span>
                         </li>
-                        <li class="month-item" style="opacity: 0.5; cursor: not-allowed;">
-                            <span class="month-name">Observación</span>
+                        <li class="month-item"
+                            [class.active]="currentProcessTab === 'observacion'"
+                            (click)="setProcessTab('observacion')"> <span class="month-name">Observación</span>
+                        </li>
+                        <li class="month-item"
+                            [class.active]="currentProcessTab === 'historias'"
+                            (click)="setProcessTab('historias')">
+                            <span class="month-name">Historias de Usuario</span>
                         </li>
                     </ul>
                 </aside>
@@ -427,6 +433,190 @@
 
                 </div>
 
+                <div class="resources-content" *ngIf="currentProcessTab === 'observacion'">
+                <div class="resources-header">
+                    <h2>Observaciones</h2>
+                    <button class="btn-add" (click)="openObservationModal()">
+                        <span class="material-icons">visibility</span>
+                        Nueva observación
+                    </button>
+                </div>
+
+                <div class="docs-grid">
+                    <div class="doc-item">
+                        <span class="material-icons">visibility</span>
+                        <p>Observación 1</p>
+                        <span class="file-type"></span>
+                    </div>
+                    <div class="doc-item">
+                        <span class="material-icons">visibility</span>
+                        <p>Observación 2</p>
+                        <span class="file-type"></span>
+                    </div>
+                </div>
+
+                <div class="modal-overlay" *ngIf="showObservationModal">
+                    <div class="modal-container interview-modal"> <div class="modal-header">
+                            <h3>Nueva Observación</h3>
+                            <button class="btn-close" (click)="closeModal()">
+                                <span class="material-icons">close</span>
+                            </button>
+                        </div>
+                        
+                        <div class="modal-body scrollable-body">
+                            <div class="form-row">
+                                <div class="form-group" style="flex: 2;">
+                                    <label>Contexto / Observación</label>
+                                    <input type="text" 
+                                           [(ngModel)]="newObservation.context">
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label>Fecha</label>
+                                    <input type="date" [(ngModel)]="newObservation.date">
+                                </div>
+                            </div>
+
+                            <hr class="divider">
+
+                            <div class="sections-container">
+                                <label class="section-label">Hallazgos y Comentarios</label>
+                                <p style="font-size: 0.85rem; color: #718096; margin-bottom: 15px;">
+                                    Registro del evento significativo que se haya observado
+                                </p>
+                                
+                                <div class="questions-list">
+                                    <div class="question-item" *ngFor="let note of newObservation.notes; let i = index; trackBy: trackByIndex">
+                                        <span class="material-icons" style="color: #a0aec0; font-size: 20px;">fiber_manual_record</span>
+                                        
+                                        <input type="text" 
+                                               class="question-input" 
+                                               [(ngModel)]="newObservation.notes[i]"> 
+                                        
+                                        <button class="btn-icon-small" (click)="removeObservationNote(i)" *ngIf="newObservation.notes.length > 1">
+                                            <span class="material-icons">close</span>
+                                        </button>
+                                    </div>
+                                    
+                                    <button class="btn-text-add" (click)="addObservationNote()">
+                                        + Agregar nota
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+                            <button class="btn-save" (click)="closeModal()">Guardar Observaciones</button>
+                        </div>
+                    </div>
+                </div>
+                </div>
+
+                <div class="resources-content" *ngIf="currentProcessTab === 'historias'">
+                <div class="resources-header">
+                    <h2>Backlog de Historias</h2>
+                    <button class="btn-add" (click)="openStoryModal()">
+                        <span class="material-icons">post_add</span>
+                        Nueva Historia
+                    </button>
+                </div>
+
+                <div class="docs-grid">
+                    <div class="doc-item">
+                        <span class="material-icons">view_kanban</span>
+                        <p>HU-01: Login Seguro</p>
+                        <span class="file-type">ALTA PRIORIDAD</span>
+                    </div>
+                    <div class="doc-item">
+                        <span class="material-icons">view_kanban</span>
+                        <p>HU-02: Exportar PDF</p>
+                        <span class="file-type">PRIORIDAD MEDIA</span>
+                    </div>
+                </div>
+
+                <div class="modal-overlay" *ngIf="showStoryModal">
+                    <div class="modal-container interview-modal"> <div class="modal-header">
+                            <h3>Redactar Historia de Usuario</h3>
+                            <button class="btn-close" (click)="closeModal()">
+                                <span class="material-icons">close</span>
+                            </button>
+                        </div>
+                        
+                        <div class="modal-body scrollable-body">
+                            
+                            <div class="form-row">
+                                <div class="form-group" style="flex: 1;">
+                                    <label>Identificador</label>
+                                    <input type="text" [(ngModel)]="newStory.identifier">
+                                </div>
+                                <div class="form-group" style="flex: 2;">
+                                    <label>Título Breve</label>
+                                    <input type="text" [(ngModel)]="newStory.title">
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label>Prioridad</label>
+                                    <select class="type-select" style="width: 100%; padding: 10px;" [(ngModel)]="newStory.priority">
+                                        <option value="Alta">Alta</option>
+                                        <option value="Media">Media</option>
+                                        <option value="Baja">Baja</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <hr class="divider">
+
+                            <div class="sections-container" style="background-color: #f7fafc; padding: 15px; border-radius: 8px; border: 1px solid #edf2f7; margin-bottom: 20px;">
+                                <label class="section-label" style="color: #319795;">Narrativa</label>
+                                
+                                <div class="form-group">
+                                    <label>¿Cómo?</label>
+                                    <input type="text" [(ngModel)]="newStory.role" style="border-left: 3px solid #4ed9d9;">
+                                </div>
+                                <div class="form-group">
+                                    <label>¿Qué quiero?</label>
+                                    <input type="text" [(ngModel)]="newStory.action" style="border-left: 3px solid #4ed9d9;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label>¿Para que lo quiero?</label>
+                                    <input type="text" [(ngModel)]="newStory.benefit" style="border-left: 3px solid #4ed9d9;">
+                                </div>
+                            </div>
+
+                            <div class="sections-container">
+                                <label class="section-label">Criterios de Aceptación</label>
+                                <p style="font-size: 0.85rem; color: #718096; margin-bottom: 15px;">
+                                    Condiciones que debe cumplir la historia para considerarse terminada
+                                </p>
+                                
+                                <div class="questions-list">
+                                    <div class="question-item" *ngFor="let crit of newStory.criteria; let i = index; trackBy: trackByIndex">
+                                        <span class="material-icons" style="color: #4ed9d9; font-size: 20px;">check_box</span>
+                                        
+                                        <input type="text" 
+                                               class="question-input" 
+                                               [(ngModel)]="newStory.criteria[i]"> 
+                                        
+                                        <button class="btn-icon-small" (click)="removeCriterion(i)" *ngIf="newStory.criteria.length > 1">
+                                            <span class="material-icons">close</span>
+                                        </button>
+                                    </div>
+                                    
+                                    <button class="btn-text-add" (click)="addCriterion()">
+                                        + Agregar criterio
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+                            <button class="btn-save" (click)="closeModal()">Guardar Historia</button>
+                        </div>
+                    </div>
+                </div>
+                </div>
+
             </div>
 
             <div class="resources-layout" *ngIf="currentSection === 'recursos'">
@@ -541,10 +731,6 @@
                             <span class="material-icons">face_3</span>
                             <p>Alan Angulo 🤣🤣</p>
                             <span class="file-type">JUNIOR</span>
-                        </div>
-                        <div class="doc-item placeholder-item">
-                            <span class="material-icons">add</span>
-                            <span class="file-type" style="margin-top: 5px;">Asignar</span>
                         </div>
                     </div>
                 </div>

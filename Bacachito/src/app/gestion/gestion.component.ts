@@ -15,6 +15,8 @@ export class GestionComponent {
   showModalNewProject: boolean = false;
   showInterviewModal: boolean = false;
   showQuestionModal: boolean = false;
+  showObservationModal: boolean = false;
+  showStoryModal: boolean = false;
 
   /*
     **
@@ -49,6 +51,32 @@ export class GestionComponent {
     ]
   };
 
+  /*
+    **
+    plantilla observación para hardcoded
+    **
+  */
+  newObservation = {
+    context: '', 
+    date: new Date().toISOString().split('T')[0], 
+    notes: [''] 
+  };
+
+  /*
+    **
+    plantilla historia de usuario para hardcoded
+    **
+  */
+  newStory = {
+    identifier: '', 
+    title: '',
+    role: '',       
+    action: '',     
+    benefit: '',    
+    priority: 'Media', 
+    criteria: ['']  
+  };
+
   /* 
     ** 
     cambio de secciones de gestión
@@ -80,10 +108,21 @@ export class GestionComponent {
     this.showQuestionModal = true;
   }
 
+  openObservationModal() {
+    this.showObservationModal = true;
+  }
+
+  openStoryModal() {
+    this.showStoryModal = true;
+  }
+
   closeModal() {
     this.showModalNewProject = false;
     this.showInterviewModal = false;
     this.showQuestionModal = false;
+    this.showObservationModal = false;
+    this.showStoryModal = false;
+
     this.newInterview =  {
       title: '',
       interviewee: '',
@@ -93,6 +132,12 @@ export class GestionComponent {
           questions: [''] 
         }
       ]
+    };
+
+    this.newObservation = {
+      context: '', 
+      date: new Date().toISOString().split('T')[0], 
+      notes: [''] 
     };
 
   }
@@ -171,4 +216,39 @@ export class GestionComponent {
       options.splice(optionIndex, 1);
     }
   }
+
+  /* 
+    **
+    Funciones para observación
+    - agregar nota
+    - eliminar nota
+    **
+  */
+  addObservationNote() {
+    this.newObservation.notes.push('');
+  }
+
+  removeObservationNote(index: number) {
+    if (this.newObservation.notes.length > 1) {
+      this.newObservation.notes.splice(index, 1);
+    }
+  }
+
+  /* 
+    **
+    Funciones para historia de usuario
+    - agregar criterio
+    - eliminar criterio
+    **
+  */
+  addCriterion() {
+    this.newStory.criteria.push('');
+  }
+
+  removeCriterion(index: number) {
+    if (this.newStory.criteria.length > 1) {
+      this.newStory.criteria.splice(index, 1);
+    }
+  }
+
 }
