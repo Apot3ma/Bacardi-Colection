@@ -16,6 +16,7 @@ export class GestionComponent {
   showInterviewModal: boolean = false;
   showQuestionModal: boolean = false;
   showObservationModal: boolean = false;
+  showStoryModal: boolean = false;
 
   /*
     **
@@ -50,10 +51,30 @@ export class GestionComponent {
     ]
   };
 
+  /*
+    **
+    plantilla observación para hardcoded
+    **
+  */
   newObservation = {
     context: '', 
     date: new Date().toISOString().split('T')[0], 
     notes: [''] 
+  };
+
+  /*
+    **
+    plantilla historia de usuario para hardcoded
+    **
+  */
+  newStory = {
+    identifier: '', 
+    title: '',
+    role: '',       
+    action: '',     
+    benefit: '',    
+    priority: 'Media', 
+    criteria: ['']  
   };
 
   /* 
@@ -91,11 +112,16 @@ export class GestionComponent {
     this.showObservationModal = true;
   }
 
+  openStoryModal() {
+    this.showStoryModal = true;
+  }
+
   closeModal() {
     this.showModalNewProject = false;
     this.showInterviewModal = false;
     this.showQuestionModal = false;
     this.showObservationModal = false;
+    this.showStoryModal = false;
 
     this.newInterview =  {
       title: '',
@@ -205,6 +231,23 @@ export class GestionComponent {
   removeObservationNote(index: number) {
     if (this.newObservation.notes.length > 1) {
       this.newObservation.notes.splice(index, 1);
+    }
+  }
+
+  /* 
+    **
+    Funciones para historia de usuario
+    - agregar criterio
+    - eliminar criterio
+    **
+  */
+  addCriterion() {
+    this.newStory.criteria.push('');
+  }
+
+  removeCriterion(index: number) {
+    if (this.newStory.criteria.length > 1) {
+      this.newStory.criteria.splice(index, 1);
     }
   }
 
