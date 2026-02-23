@@ -224,6 +224,11 @@
                             (click)="setProcessTab('historias')">
                             <span class="month-name">Historias de Usuario</span>
                         </li>
+                        <li class="month-item"
+                            [class.active]="currentProcessTab === 'focusgroup'"
+                            (click)="setProcessTab('focusgroup')">
+                            <span class="month-name">Focus Group</span>
+                        </li>
                     </ul>
                 </aside>
 
@@ -615,6 +620,103 @@
                         </div>
                     </div>
                 </div>
+                </div>
+
+                <div class="resources-content" *ngIf="currentProcessTab === 'focusgroup'">
+                    <div class="resources-header">
+                        <h2>Sesiones de Focus Group</h2>
+                        <button class="btn-add" (click)="openFocusGroupModal()">
+                            <span class="material-icons">forum</span>
+                            Nueva Sesión
+                        </button>
+                    </div>
+
+                    <div class="docs-grid">
+                        <div class="doc-item">
+                            <span class="material-icons">groups</span>
+                            <p>Validación de Interfaz</p>
+                            <span class="file-type">5 PARTICIPANTES</span>
+                        </div>
+                        <div class="doc-item">
+                            <span class="material-icons">lightbulb</span>
+                            <p>Lluvia de ideas: Nuevos Módulos</p>
+                            <span class="file-type">COMPLETADO</span>
+                        </div>
+                    </div>
+
+                    <div class="modal-overlay" *ngIf="showFocusGroupModal">
+                        <div class="modal-container interview-modal"> <div class="modal-header">
+                                <h3>Registrar Focus Group</h3>
+                                <button class="btn-close" (click)="closeModal()">
+                                    <span class="material-icons">close</span>
+                                </button>
+                            </div>
+                            
+                            <div class="modal-body scrollable-body">
+                                
+                                <div class="form-row">
+                                    <div class="form-group" style="flex: 2;">
+                                        <label>Tema de Discusión</label>
+                                        <input type="text" [(ngModel)]="newFocusGroup.topic">
+                                    </div>
+                                    <div class="form-group" style="flex: 1;">
+                                        <label>Fecha</label>
+                                        <input type="date" [(ngModel)]="newFocusGroup.date">
+                                    </div>
+                                </div>
+
+                                <hr class="divider">
+
+                                <div class="form-row">
+                                    <div class="sections-container" style="flex: 1; margin-bottom: 0;">
+                                        <label class="section-label">Participantes</label>
+                                        
+                                        <div class="questions-list">
+                                            <div class="question-item" *ngFor="let p of newFocusGroup.participants; let i = index; trackBy: trackByIndex">
+                                                <span class="material-icons">person</span>
+                                                <input type="text" 
+                                                    class="question-input" 
+                                                    placeholder="Nombre"
+                                                    [(ngModel)]="newFocusGroup.participants[i]"> 
+                                                <button class="btn-icon-small" (click)="removeParticipant(i)" *ngIf="newFocusGroup.participants.length > 1">
+                                                    <span class="material-icons">close</span>
+                                                </button>
+                                            </div>
+                                            <button class="btn-text-add" (click)="addParticipant()" style="padding-left: 25px;">
+                                                + Añadir participante
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="sections-container" style="flex: 1.5; margin-bottom: 0;">
+                                        <label class="section-label">Lluvia de Ideas / Conclusiones</label>
+                                        
+                                        <div class="questions-list">
+                                            <div class="question-item" *ngFor="let idea of newFocusGroup.ideas; let i = index; trackBy: trackByIndex">
+                                                <span class="material-icons">emoji_objects</span>
+                                                <input type="text" 
+                                                    class="question-input" 
+                                                    placeholder="Idea generada"
+                                                    [(ngModel)]="newFocusGroup.ideas[i]"> 
+                                                <button class="btn-icon-small" (click)="removeIdea(i)" *ngIf="newFocusGroup.ideas.length > 1">
+                                                    <span class="material-icons">close</span>
+                                                </button>
+                                            </div>
+                                            <button class="btn-text-add" (click)="addIdea()">
+                                                + Registrar idea
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+                                <button class="btn-save" (click)="closeModal()">Guardar Sesión</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </div>

@@ -17,6 +17,7 @@ export class GestionComponent {
   showQuestionModal: boolean = false;
   showObservationModal: boolean = false;
   showStoryModal: boolean = false;
+  showFocusGroupModal: boolean = false;
 
   /*
     **
@@ -77,6 +78,18 @@ export class GestionComponent {
     criteria: ['']  
   };
 
+  /*
+    **
+    plantilla focus group - lluvia de ideas para hardcoded
+    **
+  */
+  newFocusGroup = {
+    topic: '', 
+    date: new Date().toISOString().split('T')[0],
+    participants: [''], 
+    ideas: ['']         
+  };
+
   /* 
     ** 
     cambio de secciones de gestión
@@ -116,12 +129,17 @@ export class GestionComponent {
     this.showStoryModal = true;
   }
 
+  openFocusGroupModal() {
+    this.showFocusGroupModal = true;
+  }
+
   closeModal() {
     this.showModalNewProject = false;
     this.showInterviewModal = false;
     this.showQuestionModal = false;
     this.showObservationModal = false;
     this.showStoryModal = false;
+    this.showFocusGroupModal = false;
 
     this.newInterview =  {
       title: '',
@@ -248,6 +266,35 @@ export class GestionComponent {
   removeCriterion(index: number) {
     if (this.newStory.criteria.length > 1) {
       this.newStory.criteria.splice(index, 1);
+    }
+  }
+
+  /* 
+    **
+    Funciones para focus group - lluvia de ideas
+    - añadir participante
+    - remover participante
+    - añadir idea
+    - remover idea
+    **
+  */
+  addParticipant() {
+    this.newFocusGroup.participants.push('');
+  }
+
+  removeParticipant(index: number) {
+    if (this.newFocusGroup.participants.length > 1) {
+      this.newFocusGroup.participants.splice(index, 1);
+    }
+  }
+
+  addIdea() {
+    this.newFocusGroup.ideas.push('');
+  }
+
+  removeIdea(index: number) {
+    if (this.newFocusGroup.ideas.length > 1) {
+      this.newFocusGroup.ideas.splice(index, 1);
     }
   }
 
