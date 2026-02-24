@@ -18,6 +18,7 @@ export class GestionComponent {
   showObservationModal: boolean = false;
   showStoryModal: boolean = false;
   showFocusGroupModal: boolean = false;
+  showDocumentModal: boolean = false;
 
   /*
     **
@@ -90,6 +91,17 @@ export class GestionComponent {
     ideas: ['']         
   };
 
+  /*
+    **
+    plantilla documento para hardcoded
+    **
+  */
+  newDocument = {
+    title: '',
+    description: '',
+    fileName: '' 
+  };
+
   /* 
     ** 
     cambio de secciones de gestión
@@ -133,6 +145,10 @@ export class GestionComponent {
     this.showFocusGroupModal = true;
   }
 
+  openDocumentModal() {
+    this.showDocumentModal = true;
+  }
+
   closeModal() {
     this.showModalNewProject = false;
     this.showInterviewModal = false;
@@ -140,6 +156,7 @@ export class GestionComponent {
     this.showObservationModal = false;
     this.showStoryModal = false;
     this.showFocusGroupModal = false;
+    this.showDocumentModal = false;
 
     this.newInterview =  {
       title: '',
@@ -158,6 +175,11 @@ export class GestionComponent {
       notes: [''] 
     };
 
+    this.newDocument = { 
+      title: '', 
+      description: '', 
+      fileName: '' 
+    };
   }
 
   /* 
@@ -295,6 +317,19 @@ export class GestionComponent {
   removeIdea(index: number) {
     if (this.newFocusGroup.ideas.length > 1) {
       this.newFocusGroup.ideas.splice(index, 1);
+    }
+  }
+
+  /* 
+    **
+    Funciones para documentos
+    - seleccionar archivo y mostrar nombre
+    **
+  */
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.newDocument.fileName = file.name;
     }
   }
 

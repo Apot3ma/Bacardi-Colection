@@ -229,6 +229,11 @@
                             (click)="setProcessTab('focusgroup')">
                             <span class="month-name">Focus Group</span>
                         </li>
+                        <li class="month-item"
+                            [class.active]="currentProcessTab === 'documentos'"
+                            (click)="setProcessTab('documentos')">
+                            <span class="month-name">Análisis de Documentos</span>
+                        </li>
                     </ul>
                 </aside>
 
@@ -719,6 +724,72 @@
                     </div>
                 </div>
 
+                <div class="resources-content" *ngIf="currentProcessTab === 'documentos'">
+                    <div class="resources-header">
+                        <h2>Documentos</h2>
+                        <button class="btn-add" (click)="openDocumentModal()">
+                            <span class="material-icons">cloud_upload</span>
+                            Subir Documento
+                        </button>
+                    </div>
+
+                    <div class="docs-grid">
+                        <div class="doc-item">
+                            <span class="material-icons">picture_as_pdf</span>
+                            <p>Manual_Procesos_V1.pdf</p>
+                            <span class="file-type">NORMATIVA</span>
+                        </div>
+                        <div class="doc-item">
+                            <span class="material-icons">description</span>
+                            <p>Reglas_Negocio_2025.docx</p>
+                            <span class="file-type">REGLAS DE NEGOCIO</span>
+                        </div>
+                    </div>
+
+                    <div class="modal-overlay" *ngIf="showDocumentModal">
+                        <div class="modal-container"> <div class="modal-header">
+                                <h3>Subir Documento de Referencia</h3>
+                                <button class="btn-close" (click)="closeModal()">
+                                    <span class="material-icons">close</span>
+                                </button>
+                            </div>
+                            
+                            <div class="modal-body">
+                                
+                                <label class="upload-zone">
+                                    <span class="material-icons">cloud_upload</span>
+                                    <p *ngIf="!newDocument.fileName">Haz clic o arrastra un archivo aquí</p>
+                                    <p *ngIf="!newDocument.fileName" style="font-size: 0.8rem; color: #a0aec0; margin-top: 5px;">PDF, DOCX, XLSX (Max 10MB)</p>
+                                    
+                                    <div *ngIf="newDocument.fileName" class="selected-file">
+                                        <span class="material-icons" style="color: #38b2ac; font-size: 24px; margin-bottom: 0;">check_circle</span>
+                                        <p style="color: #319795; font-weight: bold; margin-top: 5px;">{{ newDocument.fileName }}</p>
+                                    </div>
+
+                                    <input type="file" class="hidden-file-input" (change)="onFileSelected($event)">
+                                </label>
+
+                                <hr class="divider">
+
+                                <div class="form-group">
+                                    <label>Título del Documento</label>
+                                    <input type="text" [(ngModel)]="newDocument.title">
+                                </div>
+
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label>Descripción / Utilidad</label>
+                                    <textarea rows="2" [(ngModel)]="newDocument.description"></textarea>
+                                </div>
+
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+                                <button class="btn-save" [disabled]="!newDocument.fileName" [style.opacity]="!newDocument.fileName ? '0.5' : '1'" (click)="closeModal()">Guardar Documento</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="resources-layout" *ngIf="currentSection === 'recursos'">
