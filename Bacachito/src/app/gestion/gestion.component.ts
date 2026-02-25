@@ -19,6 +19,7 @@ export class GestionComponent {
   showStoryModal: boolean = false;
   showFocusGroupModal: boolean = false;
   showDocumentModal: boolean = false;
+  showTransactionModal: boolean = false;
 
   /*
     **
@@ -102,6 +103,18 @@ export class GestionComponent {
     fileName: '' 
   };
 
+  /*
+    **
+    plantilla documento para hardcoded
+    **
+  */
+  newTransaction = {
+    name: '',
+    trigger: '', 
+    steps: [''], 
+    result: ''   
+  };
+
   /* 
     ** 
     cambio de secciones de gestión
@@ -149,6 +162,10 @@ export class GestionComponent {
     this.showDocumentModal = true;
   }
 
+  openTransactionModal() {
+    this.showTransactionModal = true;
+  }
+
   closeModal() {
     this.showModalNewProject = false;
     this.showInterviewModal = false;
@@ -157,6 +174,7 @@ export class GestionComponent {
     this.showStoryModal = false;
     this.showFocusGroupModal = false;
     this.showDocumentModal = false;
+    this.showTransactionModal = false;
 
     this.newInterview =  {
       title: '',
@@ -330,6 +348,23 @@ export class GestionComponent {
     const file = event.target.files[0];
     if (file) {
       this.newDocument.fileName = file.name;
+    }
+  }
+
+  /* 
+    **
+    Funciones para transacción
+    - agregar paso
+    - remover paso
+    **
+  */
+  addTransactionStep() {
+    this.newTransaction.steps.push('');
+  }
+
+  removeTransactionStep(index: number) {
+    if (this.newTransaction.steps.length > 1) {
+      this.newTransaction.steps.splice(index, 1);
     }
   }
 

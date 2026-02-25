@@ -234,6 +234,11 @@
                             (click)="setProcessTab('documentos')">
                             <span class="month-name">Análisis de Documentos</span>
                         </li>
+                        <li class="month-item"
+                            [class.active]="currentProcessTab === 'transaccional'"
+                            (click)="setProcessTab('transaccional')">
+                            <span class="month-name">Seg. Transaccional</span>
+                        </li>
                     </ul>
                 </aside>
 
@@ -786,6 +791,90 @@
                             <div class="modal-footer">
                                 <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
                                 <button class="btn-save" [disabled]="!newDocument.fileName" [style.opacity]="!newDocument.fileName ? '0.5' : '1'" (click)="closeModal()">Guardar Documento</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resources-content" *ngIf="currentProcessTab === 'transaccional'">
+                    <div class="resources-header">
+                        <h2>Mapeo de Flujos Transaccionales</h2>
+                        <button class="btn-add" (click)="openTransactionModal()">
+                            <span class="material-icons">timeline</span>
+                            Nuevo Flujo
+                        </button>
+                    </div>
+
+                    <div class="docs-grid">
+                        <div class="doc-item">
+                            <span class="material-icons">route</span>
+                            <p>Pago en Carrito de Compras</p>
+                            <span class="file-type">5 PASOS</span>
+                        </div>
+                        <div class="doc-item">
+                            <span class="material-icons">route</span>
+                            <p>Registro de Nuevo Usuario</p>
+                            <span class="file-type">3 PASOS</span>
+                        </div>
+                    </div>
+
+                    <div class="modal-overlay" *ngIf="showTransactionModal">
+                        <div class="modal-container interview-modal"> <div class="modal-header">
+                                <h3>Rastrear Transacción</h3>
+                                <button class="btn-close" (click)="closeModal()">
+                                    <span class="material-icons">close</span>
+                                </button>
+                            </div>
+                            
+                            <div class="modal-body scrollable-body">
+                                
+                                <div class="form-row">
+                                    <div class="form-group" style="flex: 2;">
+                                        <label>Nombre de la Transacción</label>
+                                        <input type="text" [(ngModel)]="newTransaction.name">
+                                    </div>
+                                    <div class="form-group" style="flex: 1;">
+                                        <label>Evento Disparador (Trigger)</label>
+                                        <input type="text" [(ngModel)]="newTransaction.trigger">
+                                    </div>
+                                </div>
+
+                                <hr class="divider">
+
+                                <div class="sections-container" style="background-color: #f7fafc; padding: 15px; border-radius: 8px; border: 1px solid #edf2f7; margin-bottom: 20px;">
+                                    <label class="section-label">
+                                        <span class="material-icons">format_list_numbered</span> Secuencia de Pasos
+                                    </label>
+                                    
+                                    <div class="questions-list">
+                                        <div class="question-item" *ngFor="let step of newTransaction.steps; let i = index; trackBy: trackByIndex">
+                                            <span class="q-number">{{i + 1}}.</span>
+                                            
+                                            <input type="text" 
+                                                class="question-input"
+                                                [(ngModel)]="newTransaction.steps[i]"> 
+                                            
+                                            <button class="btn-icon-small" (click)="removeTransactionStep(i)" *ngIf="newTransaction.steps.length > 1">
+                                                <span class="material-icons">close</span>
+                                            </button>
+                                        </div>
+                                        
+                                        <button class="btn-text-add" (click)="addTransactionStep()">
+                                            + Agregar siguiente paso
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label>Resultado / Salida del Sistema</label>
+                                    <input type="text" [(ngModel)]="newTransaction.result" style="border-left: 3px solid #38b2ac;">
+                                </div>
+
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+                                <button class="btn-save" (click)="closeModal()">Guardar Flujo</button>
                             </div>
                         </div>
                     </div>
