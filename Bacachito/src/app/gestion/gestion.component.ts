@@ -23,6 +23,18 @@ export class GestionComponent {
 
   /*
     **
+    plantilla sección de configuración para hardcoded
+    **
+  */
+  configProject = {
+    name: 'BCH',
+    description: 'Bacachito xd',
+    startDate: '26-02-2026',
+    status: 'activo'
+  };
+
+  /*
+    **
     plantilla entrevista para hardcoded
     **
   */

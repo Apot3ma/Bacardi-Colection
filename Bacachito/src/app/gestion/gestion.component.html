@@ -40,6 +40,13 @@
                 <span class="material-icons">group</span>
                 <p>Equipo</p>
             </button>
+
+            <button class="menu-item" 
+                    [class.active]="currentSection === 'configuracion'"
+                    (click)="setSection('configuracion')">
+                <span class="material-icons">settings</span>
+                <p>Configuración</p>
+            </button>
         </nav>
     </aside>
 
@@ -50,6 +57,7 @@
                    currentSection === 'recursos' ? 'Gestión de Recursos' : 
                    currentSection === 'equipo' ? 'Gestión de Equipo' :
                    currentSection === 'home' ? 'Mis Proyectos' :
+                   currentSection === 'configuracion' ? 'Configuración del proyecto' :
                    'Sección en construcción' }}</h1>
         </header>
 
@@ -998,8 +1006,77 @@
                 </div>
             </div>
 
+            <div class="projects-view" *ngIf="currentSection === 'configuracion'" style="padding-top: 20px;">
+                <div class="resources-header">
+                    <h2>Configuración del Proyecto</h2>
+                </div>
+
+                <div class="config-container">
+                    
+                    <div class="question-card">
+                        <h3 class="section-label" style="border-bottom: 1px solid #edf2f7; padding-bottom: 10px; margin-bottom: 20px;">
+                            <span class="material-icons" style="vertical-align: bottom; margin-right: 5px; color: #a0aec0;">tune</span>
+                            Detalles Generales
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label>Nombre del Proyecto</label>
+                            <input type="text" [(ngModel)]="configProject.name">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Descripción</label>
+                            <textarea rows="3" [(ngModel)]="configProject.description"></textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group" style="flex: 1;">
+                                <label>Fecha de Inicio</label>
+                                <input type="date" [(ngModel)]="configProject.startDate">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Estado del Proyecto</label>
+                                <select class="type-select" style="width: 100%; padding: 10px;" [(ngModel)]="configProject.status">
+                                    <option value="activo">Activo</option>
+                                    <option value="pausado">Pausado</option>
+                                    <option value="completado">Completado</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="text-align: right; margin-top: 15px;">
+                            <button class="btn-save">Guardar Cambios</button>
+                        </div>
+                    </div>
+
+                    <div class="question-card danger-zone">
+                        <h3 class="section-label" style="color: #e53e3e; border-bottom: 1px solid #fed7d7; padding-bottom: 10px; margin-bottom: 20px;">
+                            <span class="material-icons" style="vertical-align: bottom; margin-right: 5px;">warning</span>
+                            Peligro we
+                        </h3>
+                        
+                        <div class="danger-item">
+                            <div>
+                                <strong>Archivar Proyecto</strong>
+                            </div>
+                            <button class="btn-cancel">Archivar</button>
+                        </div>
+                        
+                        <hr class="divider">
+                        
+                        <div class="danger-item">
+                            <div>
+                                <strong>Eliminar Proyecto</strong>
+                            </div>
+                            <button class="btn-danger">Eliminar</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
         <div *ngIf="currentSection !== 'dashboard' && currentSection !== 'recursos' && currentSection !== 'equipo' 
-        && currentSection !== 'home' && currentSection !== 'procesos'"
+        && currentSection !== 'home' && currentSection !== 'procesos' && currentSection !== 'configuracion'"
                  style="text-align: center; padding-top: 50px;">
                 <span class="material-icons" style="font-size: 48px; color: #cbd5e0;">construction</span>
                 <p style="color: #a0aec0; margin-top: 10px;">Esta sección está en desarrollo.</p>
