@@ -88,9 +88,10 @@ header h1 {
 
 .canvas-area {
     border: 2px dashed #cbd5e0; 
-    height: 80%;
+    min-height: 80%;
     border-radius: 8px;
     display: block;
+    padding: 12px;
     justify-content: center;
     align-items: center;
     color: #a0aec0;
@@ -825,4 +826,91 @@ header h1 {
     padding-left: 0;
     margin-top: 5px;
     text-align: left;
+}
+
+.upload-zone {
+    border: 2px dashed #cbd5e0;
+    border-radius: 8px;
+    padding: 30px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #f7fafc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.upload-zone:hover {
+    border-color: #4ed9d9;
+    background-color: #e6fffa;
+}
+
+.upload-zone .material-icons {
+    font-size: 48px;
+    color: #a0aec0;
+    margin-bottom: 10px;
+    transition: color 0.3s ease;
+}
+
+.upload-zone:hover .material-icons {
+    color: #4ed9d9;
+}
+
+.hidden-file-input {
+    display: none;
+}
+
+.selected-file {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.config-container {
+    max-width: 800px; 
+    margin: 0 auto; 
+    width: 100%;
+}
+
+.danger-zone {
+    border-color: #fc8181;
+    background-color: #fffaf0; 
+}
+
+.danger-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.danger-item strong {
+    color: #2d3748;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.danger-item p {
+    font-size: 0.85rem;
+    color: #718096;
+    margin: 0;
+}
+
+.btn-danger {
+    background: #e53e3e;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+    min-width: 100px; 
+}
+
+.btn-danger:hover {
+    background-color: #c53030;
 }

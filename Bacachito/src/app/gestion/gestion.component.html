@@ -40,6 +40,13 @@
                 <span class="material-icons">group</span>
                 <p>Equipo</p>
             </button>
+
+            <button class="menu-item" 
+                    [class.active]="currentSection === 'configuracion'"
+                    (click)="setSection('configuracion')">
+                <span class="material-icons">settings</span>
+                <p>Configuración</p>
+            </button>
         </nav>
     </aside>
 
@@ -50,6 +57,7 @@
                    currentSection === 'recursos' ? 'Gestión de Recursos' : 
                    currentSection === 'equipo' ? 'Gestión de Equipo' :
                    currentSection === 'home' ? 'Mis Proyectos' :
+                   currentSection === 'configuracion' ? 'Configuración del proyecto' :
                    'Sección en construcción' }}</h1>
         </header>
 
@@ -228,6 +236,16 @@
                             [class.active]="currentProcessTab === 'focusgroup'"
                             (click)="setProcessTab('focusgroup')">
                             <span class="month-name">Focus Group</span>
+                        </li>
+                        <li class="month-item"
+                            [class.active]="currentProcessTab === 'documentos'"
+                            (click)="setProcessTab('documentos')">
+                            <span class="month-name">Análisis de Documentos</span>
+                        </li>
+                        <li class="month-item"
+                            [class.active]="currentProcessTab === 'transaccional'"
+                            (click)="setProcessTab('transaccional')">
+                            <span class="month-name">Seg. Transaccional</span>
                         </li>
                     </ul>
                 </aside>
@@ -719,6 +737,156 @@
                     </div>
                 </div>
 
+                <div class="resources-content" *ngIf="currentProcessTab === 'documentos'">
+                    <div class="resources-header">
+                        <h2>Documentos</h2>
+                        <button class="btn-add" (click)="openDocumentModal()">
+                            <span class="material-icons">cloud_upload</span>
+                            Subir Documento
+                        </button>
+                    </div>
+
+                    <div class="docs-grid">
+                        <div class="doc-item">
+                            <span class="material-icons">picture_as_pdf</span>
+                            <p>Manual_Procesos_V1.pdf</p>
+                            <span class="file-type">NORMATIVA</span>
+                        </div>
+                        <div class="doc-item">
+                            <span class="material-icons">description</span>
+                            <p>Reglas_Negocio_2025.docx</p>
+                            <span class="file-type">REGLAS DE NEGOCIO</span>
+                        </div>
+                    </div>
+
+                    <div class="modal-overlay" *ngIf="showDocumentModal">
+                        <div class="modal-container"> <div class="modal-header">
+                                <h3>Subir Documento de Referencia</h3>
+                                <button class="btn-close" (click)="closeModal()">
+                                    <span class="material-icons">close</span>
+                                </button>
+                            </div>
+                            
+                            <div class="modal-body">
+                                
+                                <label class="upload-zone">
+                                    <span class="material-icons">cloud_upload</span>
+                                    <p *ngIf="!newDocument.fileName">Haz clic o arrastra un archivo aquí</p>
+                                    <p *ngIf="!newDocument.fileName" style="font-size: 0.8rem; color: #a0aec0; margin-top: 5px;">PDF, DOCX, XLSX (Max 10MB)</p>
+                                    
+                                    <div *ngIf="newDocument.fileName" class="selected-file">
+                                        <span class="material-icons" style="color: #38b2ac; font-size: 24px; margin-bottom: 0;">check_circle</span>
+                                        <p style="color: #319795; font-weight: bold; margin-top: 5px;">{{ newDocument.fileName }}</p>
+                                    </div>
+
+                                    <input type="file" class="hidden-file-input" (change)="onFileSelected($event)">
+                                </label>
+
+                                <hr class="divider">
+
+                                <div class="form-group">
+                                    <label>Título del Documento</label>
+                                    <input type="text" [(ngModel)]="newDocument.title">
+                                </div>
+
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label>Descripción / Utilidad</label>
+                                    <textarea rows="2" [(ngModel)]="newDocument.description"></textarea>
+                                </div>
+
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+                                <button class="btn-save" [disabled]="!newDocument.fileName" [style.opacity]="!newDocument.fileName ? '0.5' : '1'" (click)="closeModal()">Guardar Documento</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resources-content" *ngIf="currentProcessTab === 'transaccional'">
+                    <div class="resources-header">
+                        <h2>Mapeo de Flujos Transaccionales</h2>
+                        <button class="btn-add" (click)="openTransactionModal()">
+                            <span class="material-icons">timeline</span>
+                            Nuevo Flujo
+                        </button>
+                    </div>
+
+                    <div class="docs-grid">
+                        <div class="doc-item">
+                            <span class="material-icons">route</span>
+                            <p>Pago en Carrito de Compras</p>
+                            <span class="file-type">5 PASOS</span>
+                        </div>
+                        <div class="doc-item">
+                            <span class="material-icons">route</span>
+                            <p>Registro de Nuevo Usuario</p>
+                            <span class="file-type">3 PASOS</span>
+                        </div>
+                    </div>
+
+                    <div class="modal-overlay" *ngIf="showTransactionModal">
+                        <div class="modal-container interview-modal"> <div class="modal-header">
+                                <h3>Rastrear Transacción</h3>
+                                <button class="btn-close" (click)="closeModal()">
+                                    <span class="material-icons">close</span>
+                                </button>
+                            </div>
+                            
+                            <div class="modal-body scrollable-body">
+                                
+                                <div class="form-row">
+                                    <div class="form-group" style="flex: 2;">
+                                        <label>Nombre de la Transacción</label>
+                                        <input type="text" [(ngModel)]="newTransaction.name">
+                                    </div>
+                                    <div class="form-group" style="flex: 1;">
+                                        <label>Evento Disparador (Trigger)</label>
+                                        <input type="text" [(ngModel)]="newTransaction.trigger">
+                                    </div>
+                                </div>
+
+                                <hr class="divider">
+
+                                <div class="sections-container" style="background-color: #f7fafc; padding: 15px; border-radius: 8px; border: 1px solid #edf2f7; margin-bottom: 20px;">
+                                    <label class="section-label">
+                                        <span class="material-icons">format_list_numbered</span> Secuencia de Pasos
+                                    </label>
+                                    
+                                    <div class="questions-list">
+                                        <div class="question-item" *ngFor="let step of newTransaction.steps; let i = index; trackBy: trackByIndex">
+                                            <span class="q-number">{{i + 1}}.</span>
+                                            
+                                            <input type="text" 
+                                                class="question-input"
+                                                [(ngModel)]="newTransaction.steps[i]"> 
+                                            
+                                            <button class="btn-icon-small" (click)="removeTransactionStep(i)" *ngIf="newTransaction.steps.length > 1">
+                                                <span class="material-icons">close</span>
+                                            </button>
+                                        </div>
+                                        
+                                        <button class="btn-text-add" (click)="addTransactionStep()">
+                                            + Agregar siguiente paso
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label>Resultado / Salida del Sistema</label>
+                                    <input type="text" [(ngModel)]="newTransaction.result" style="border-left: 3px solid #38b2ac;">
+                                </div>
+
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+                                <button class="btn-save" (click)="closeModal()">Guardar Flujo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="resources-layout" *ngIf="currentSection === 'recursos'">
@@ -838,8 +1006,77 @@
                 </div>
             </div>
 
+            <div class="projects-view" *ngIf="currentSection === 'configuracion'" style="padding-top: 20px;">
+                <div class="resources-header">
+                    <h2>Configuración del Proyecto</h2>
+                </div>
+
+                <div class="config-container">
+                    
+                    <div class="question-card">
+                        <h3 class="section-label" style="border-bottom: 1px solid #edf2f7; padding-bottom: 10px; margin-bottom: 20px;">
+                            <span class="material-icons" style="vertical-align: bottom; margin-right: 5px; color: #a0aec0;">tune</span>
+                            Detalles Generales
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label>Nombre del Proyecto</label>
+                            <input type="text" [(ngModel)]="configProject.name">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Descripción</label>
+                            <textarea rows="3" [(ngModel)]="configProject.description"></textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group" style="flex: 1;">
+                                <label>Fecha de Inicio</label>
+                                <input type="date" [(ngModel)]="configProject.startDate">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Estado del Proyecto</label>
+                                <select class="type-select" style="width: 100%; padding: 10px;" [(ngModel)]="configProject.status">
+                                    <option value="activo">Activo</option>
+                                    <option value="pausado">Pausado</option>
+                                    <option value="completado">Completado</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="text-align: right; margin-top: 15px;">
+                            <button class="btn-save">Guardar Cambios</button>
+                        </div>
+                    </div>
+
+                    <div class="question-card danger-zone">
+                        <h3 class="section-label" style="color: #e53e3e; border-bottom: 1px solid #fed7d7; padding-bottom: 10px; margin-bottom: 20px;">
+                            <span class="material-icons" style="vertical-align: bottom; margin-right: 5px;">warning</span>
+                            Peligro we
+                        </h3>
+                        
+                        <div class="danger-item">
+                            <div>
+                                <strong>Archivar Proyecto</strong>
+                            </div>
+                            <button class="btn-cancel">Archivar</button>
+                        </div>
+                        
+                        <hr class="divider">
+                        
+                        <div class="danger-item">
+                            <div>
+                                <strong>Eliminar Proyecto</strong>
+                            </div>
+                            <button class="btn-danger">Eliminar</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
         <div *ngIf="currentSection !== 'dashboard' && currentSection !== 'recursos' && currentSection !== 'equipo' 
-        && currentSection !== 'home' && currentSection !== 'procesos'"
+        && currentSection !== 'home' && currentSection !== 'procesos' && currentSection !== 'configuracion'"
                  style="text-align: center; padding-top: 50px;">
                 <span class="material-icons" style="font-size: 48px; color: #cbd5e0;">construction</span>
                 <p style="color: #a0aec0; margin-top: 10px;">Esta sección está en desarrollo.</p>
