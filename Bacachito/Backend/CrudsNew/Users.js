@@ -84,15 +84,25 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     const pool = req.app.locals.pool;
     const { id } = req.params;
+
     try {
         const [result] = await pool.query(
-            'UPDATE user SET status = B WHERE id =? AND status = A',[id]);
+            "UPDATE `user` SET status = 'B' WHERE id = ? AND status = 'A'",
+            [id]
+        );
+
         if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Usuario no encontrado' });
-        }else {
-            res.json({ message : 'Usuario eliminado' });
+            return res.status(404).json({
+                error: 'Usuario no existe o ya está dado de baja'
+            });
         }
+
+        res.json({ message: 'Usuario dado de baja correctamente' });
+
     } catch (err) {
-        res.status(500).json({ error: 'Error al eliminar el usuario' });
+        console.error(err);
+        res.status(500).json({
+            error: 'Error al eliminar el usuario'
+        });
     }
 });

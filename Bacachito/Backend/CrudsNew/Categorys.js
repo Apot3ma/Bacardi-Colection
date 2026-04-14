@@ -53,8 +53,7 @@ router.get('/:id_project', async (req,res)=>{
 // =============================
 // ==ACTUALIZAR UNA CATEGORIA ==
 // =============================
-        //PARA ENCONTRAR LA CATEGORIA SE SOLICITA EN EL URL EL ID DE LA CATEGORIA
-        // NOMBRE, DESCRIPCION
+        //PARA ENCONTRAR LA CATEGORIA SE SOLICITA EN EL URL EL ID LA CATEGORIA
 router.put('/:id', async (req, res) => {
     const pool = req.app.locals.pool;
     const {name,description} = req.params;
@@ -65,11 +64,31 @@ router.put('/:id', async (req, res) => {
             [name,description,id]
         );
         if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Categoria no encontrado' });
+            return res.status(404).json({ error: 'Categoria no encontrada' });
         }else {
-            res.json({ message : 'Categoria actualizado' });
+            res.json({ message : 'Categoria actualizada' });
         }
     } catch (err) {
         res.status(500).json({ error: 'Error al actualizar la categoria',details: err.message });
+    }
+});
+
+// =======================
+// ==ELIMINAR CATEGORIAS==
+// =======================
+        //PARA ENCONTRAR LA CATEGORIA SE SOLICITA EN EL URL EL ID LA CATEGORIA
+router.delete('/:id', async (req, res) => {
+    const pool = req.app.locals.pool;
+    const { id } = req.params;
+    try {
+        const [result] = await pool.query(
+            'DELETE FROM category WHERE id = ?',[id]);
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Categoria no encontrada' });
+        }else {
+            res.json({ message : 'Categoria eliminada' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Error al eliminar la categoria' });
     }
 });
