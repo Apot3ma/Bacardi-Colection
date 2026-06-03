@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { stat } from "node:fs";
 
 const router = Router();
 
@@ -15,17 +14,21 @@ const router = Router();
 // ==CREAR UN USUARIO==
 // ====================
         // SE SOLICITA NOMBRE,ID DEL CREADOR ,DESCRIPCION(OPCIONAL),FECHA DE ENTREGA
-router.post('/', async (req,res)=>{
+router.post('/register', async (req,res)=>{
     const pool =req.app.locals.pool;
-    const {name,email,password,position,date_creation} = req.body;
-    stat = "A";
+    const {name,email,password,position} = req.body;
+    const status = "A";
+    const date_creation = new Date().toISOString().slice(0, 19).replace('T', ' ');
     try{
         const [result] = await pool.query(
             'INSERT INTO user (name,email,password,position,date_creation,status) VALUES (?,?,?,?,?,?)',
-            [name,email,password,position,date_creation,stat]
+            [name,email,password,position,date_creation,status]
         );
-            res.status(200).json({id:result.insertId})
+            res.status(201).json({id:result.insertId, message: 'Usuario creado exitosamente'})
     }catch(err){
+        if (err.code === 'ER_DUP_ENTRY') {
+            return res.status(409).json({ error: 'El email ya está registrado' });
+        }
         res.status(500).json({error: 'Error', details:err.message})
     }
 });
@@ -35,21 +38,20 @@ router.post('/', async (req,res)=>{
 // ========================================
         //PARA ENCONTRAR LOS PROYECTOS SE SOLICITA EL USUARIO Y CONTRASENA
 
-router.get('/', async (req,res)=>{
+router.post('/login', async (req,res)=>{
     const pool =req.app.locals.pool;
-    const {name,password} = req.body;
+    const {email,password} = req.body;
     try{
         const [result] = await pool.query(
-            'SELECT id FROM user WHERE name = ? AND password = ? AND status = A',
-            [name,password]
+            "SELECT id, name, email, position FROM user WHERE email = ? AND password = ? AND status = 'A'",
+            [email,password]
         );
          if (result.length === 0) {
-            return res.status(404).json({ error: 'no existe el usuario' });
+            return res.status(401).json({ error: 'Credenciales incorrectas o usuario no existe' });
         }
-        res.json(result);       
+        res.json({ message: 'Login exitoso', user: result[0] });       
     }catch(err){
-        res.status(500).json({error: 'Error', details:err.message}
-        )
+        res.status(500).json({error: 'Error', details:err.message})
     }
 });
 
@@ -106,3 +108,5 @@ router.delete('/:id', async (req, res) => {
         });
     }
 });
+
+export default router;

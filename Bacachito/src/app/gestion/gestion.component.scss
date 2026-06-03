@@ -914,3 +914,8 @@ header h1 {
 .btn-danger:hover {
     background-color: #c53030;
 }
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}

@@ -6,44 +6,33 @@
 
         <nav class="menu">
 
-            <button class="menu-item" 
-                    [class.active]="currentSection === 'home'" 
-                    (click)="setSection('home')">
+            <button class="menu-item" [class.active]="currentSection === 'home'" (click)="setSection('home')">
                 <span class="material-icons">home</span>
                 <p>Inicio</p>
             </button>
 
-            <button class="menu-item" 
-                    [class.active]="currentSection === 'dashboard'" 
-                    (click)="setSection('dashboard')">
+            <button class="menu-item" [class.active]="currentSection === 'dashboard'" (click)="setSection('dashboard')">
                 <span class="material-icons">dashboard</span>
                 <p>Dashboard</p>
             </button>
 
-            <button class="menu-item" 
-                    [class.active]="currentSection === 'procesos'"
-                    (click)="setSection('procesos')">
+            <button class="menu-item" [class.active]="currentSection === 'procesos'" (click)="setSection('procesos')">
                 <span class="material-icons">assignment</span>
                 <p>Procesos</p>
             </button>
 
-            <button class="menu-item" 
-                    [class.active]="currentSection === 'recursos'"
-                    (click)="setSection('recursos')">
+            <button class="menu-item" [class.active]="currentSection === 'recursos'" (click)="setSection('recursos')">
                 <span class="material-icons">folder</span>
                 <p>Recursos</p>
             </button>
 
-            <button class="menu-item" 
-                    [class.active]="currentSection === 'equipo'"
-                    (click)="setSection('equipo')">
+            <button class="menu-item" [class.active]="currentSection === 'equipo'" (click)="setSection('equipo')">
                 <span class="material-icons">group</span>
                 <p>Equipo</p>
             </button>
 
-            <button class="menu-item" 
-                    [class.active]="currentSection === 'configuracion'"
-                    (click)="setSection('configuracion')">
+            <button class="menu-item" [class.active]="currentSection === 'configuracion'"
+                (click)="setSection('configuracion')">
                 <span class="material-icons">settings</span>
                 <p>Configuración</p>
             </button>
@@ -52,13 +41,14 @@
 
     <main class="main-content">
         <header>
-            <h1>{{ currentSection === 'dashboard' ? 'Dashboard del Proyecto' : 
-                   currentSection === 'procesos' ? 'Ingeniería de Requisitos' :
-                   currentSection === 'recursos' ? 'Gestión de Recursos' : 
-                   currentSection === 'equipo' ? 'Gestión de Equipo' :
-                   currentSection === 'home' ? 'Mis Proyectos' :
-                   currentSection === 'configuracion' ? 'Configuración del proyecto' :
-                   'Sección en construcción' }}</h1>
+            <h1>{{ currentSection === 'dashboard' ? (selectedProject ? selectedProject.name + ' — Dashboard' :
+                'Dashboard del Proyecto') :
+                currentSection === 'procesos' ? 'Ingeniería de Requisitos' :
+                currentSection === 'recursos' ? 'Gestión de Recursos' :
+                currentSection === 'equipo' ? 'Gestión de Equipo' :
+                currentSection === 'home' ? ('Mis Proyectos' + (userName ? ' — ' + userName : '')) :
+                currentSection === 'configuracion' ? 'Configuración del proyecto' :
+                'Sección en construcción' }}</h1>
         </header>
 
         <section class="canvas-area">
@@ -72,51 +62,41 @@
                     </button>
                 </div>
 
-                <div class="projects-grid">
-                    <div class="project-card active-project" (click)="setSection('dashboard')">
-                        <div class="card-content">
-                            <h3>BCH</h3>
-                            <p class="project-desc">Sistema de gestión bancaria y recursos internos.</p>
-                        </div>
-                        
-                        <div class="project-footer">
-                            <div class="sprint-info">
-                                <span>Progreso</span>
-                                <div class="progress-bar-container">
-                                    <div class="progress-bar" style="width: 75%;"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div *ngIf="isLoadingProjects" style="text-align: center; padding: 60px 0;">
+                    <span class="material-icons"
+                        style="font-size: 48px; color: #38b2ac; animation: spin 1s linear infinite;">autorenew</span>
+                    <p style="color: #a0aec0; margin-top: 15px;">Cargando proyectos...</p>
+                </div>
 
-                    <div class="project-card">
-                        <div class="card-content">
-                            <h3>E-Commerce Web</h3>
-                            <p class="project-desc">Plataforma de ventas online para retail.</p>
-                        </div>
-                        
-                        <div class="project-footer">
-                            <div class="sprint-info">
-                                <span>Progreso</span>
-                                <div class="progress-bar-container">
-                                    <div class="progress-bar" style="width: 30%;"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div *ngIf="projectsError && !isLoadingProjects" style="text-align: center; padding: 60px 0;">
+                    <span class="material-icons" style="font-size: 48px; color: #e53e3e;">error_outline</span>
+                    <p style="color: #e53e3e; margin-top: 15px;">{{ projectsError }}</p>
+                    <button class="btn-add" style="margin-top: 15px;" (click)="ngOnInit()">
+                        <span class="material-icons">refresh</span>
+                        Reintentar
+                    </button>
+                </div>
 
-                    <div class="project-card">
+                <div *ngIf="!isLoadingProjects && !projectsError && projects.length === 0"
+                    style="text-align: center; padding: 60px 0;">
+                    <span class="material-icons" style="font-size: 48px; color: #cbd5e0;">folder_open</span>
+                    <p style="color: #a0aec0; margin-top: 15px;">No tienes proyectos aún. ¡Crea tu primer proyecto!</p>
+                </div>
+
+                <div class="projects-grid" *ngIf="!isLoadingProjects && !projectsError && projects.length > 0">
+                    <div class="project-card" *ngFor="let project of projects; let i = index"
+                        [class.active-project]="i === 0" (click)="selectProject(project)">
                         <div class="card-content">
-                            <h3>App Móvil V2</h3>
-                            <p class="project-desc">Rediseño de la aplicación nativa iOS/Android.</p>
+                            <h3>{{ project.name }}</h3>
+                            <p class="project-desc">{{ project.description || 'Sin descripción' }}</p>
                         </div>
-                        
+
                         <div class="project-footer">
                             <div class="sprint-info">
-                                <span>Progreso</span>
-                                <div class="progress-bar-container">
-                                    <div class="progress-bar" style="width: 100%;"></div>
-                                </div>
+                                <span>Fecha de entrega</span>
+                                <p style="font-size: 0.85rem; color: #718096; margin-top: 4px;">
+                                    {{ project.deadline ? (project.deadline | date:'dd/MM/yyyy') : 'Sin definir' }}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -130,120 +110,108 @@
                                 <span class="material-icons">close</span>
                             </button>
                         </div>
-                        
+
                         <div class="modal-body">
+                            <div *ngIf="createProjectError"
+                                style="background: rgba(220, 53, 69, 0.1); color: #e53e3e; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
+                                {{ createProjectError }}
+                            </div>
+
                             <div class="form-group">
                                 <label>Nombre del Proyecto</label>
-                                <input type="text">
+                                <input type="text" [(ngModel)]="newProject.name" placeholder="Nombre del proyecto">
                             </div>
 
                             <div class="form-group">
                                 <label>Descripción</label>
-                                <textarea rows="3" ></textarea>
+                                <textarea rows="3" [(ngModel)]="newProject.description"
+                                    placeholder="Descripción del proyecto (opcional)"></textarea>
                             </div>
 
                             <div class="form-group">
-                                <label>Líder del Proyecto (PM)</label>
-                                <div class="input-with-icon">
-                                    <span class="material-icons">person</span>
-                                    <input type="text" placeholder="Nombre del responsable">
-                                </div>
+                                <label>Fecha de Entrega</label>
+                                <input type="date" [(ngModel)]="newProject.deadline">
                             </div>
                         </div>
 
                         <div class="modal-footer">
-                            <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
-                            <button class="btn-save" (click)="closeModal()">Crear Proyecto</button>
+                            <button class="btn-cancel" (click)="closeModal()"
+                                [disabled]="isCreatingProject">Cancelar</button>
+                            <button class="btn-save" (click)="createProject()"
+                                [disabled]="!newProject.name.trim() || isCreatingProject">
+                                {{ isCreatingProject ? 'Creando...' : 'Crear Proyecto' }}
+                            </button>
                         </div>
                     </div>
                 </div>
-                
+
             </div>
-            
+
             <div class="dashboard-grid" *ngIf="currentSection === 'dashboard'">
                 <div class="stats-column">
                     <div class="stat-card">
                         <h3>Procesos Completos</h3>
-                        <div class="progress-circle">
-                            <svg viewBox="0 0 36 36" class="circular-chart">
-                                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                <path class="circle" stroke-dasharray="75, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                <text x="18" y="20.35" class="percentage">75%</text>
-                            </svg>
+                        <div style="display:flex; align-items:center; justify-content:center; height:160px;">
+                            <span class="material-icons" style="font-size:48px; color:#cbd5e0;">bar_chart</span>
                         </div>
-                        <div class="sprint-info">
-                            <p>Progreso de Sprint</p>
-                            <div class="progress-bar-container">
-                                <div class="progress-bar" style="width: 75%;"></div>
-                            </div>
-                            <span>Semana 3 / 4</span>
-                        </div>
+                        <p style="color:#a0aec0; font-size:0.85rem; text-align:center;">Sin datos disponibles</p>
                     </div>
                 </div>
-        
+
                 <div class="documents-column">
                     <h3>Documentos recientes</h3>
-                    <div class="docs-grid">
-                        <div class="doc-item">
-                            <span class="material-icons">image</span>
-                            <p>Entregable.jpg</p>
-                            <span class="file-type">JPG</span>
-                        </div>
-                        <div class="doc-item">
-                            <span class="material-icons">picture_as_pdf</span>
-                            <p>Contrato.pdf</p>
-                            <span class="file-type">PDF</span>
-                        </div>
-                        <div class="doc-item">
-                            <span class="material-icons">description</span>
-                            <p>Manual.docx</p>
-                            <span class="file-type">DOCX</span>
-                        </div>
-                        <div class="doc-item">
-                            <span class="material-icons">folder_zip</span>
-                            <p>Assets.zip</p>
-                            <span class="file-type">ZIP</span>
+
+                    <div *ngIf="isLoadingRecent" style="text-align:center; padding:40px 0;">
+                        <span class="material-icons" style="font-size:40px; color:#38b2ac; animation:spin 1s linear infinite;">autorenew</span>
+                    </div>
+
+                    <div *ngIf="!isLoadingRecent && recentResources.length === 0" style="text-align:center; padding:30px 0;">
+                        <span class="material-icons" style="font-size:40px; color:#cbd5e0;">inbox</span>
+                        <p style="color:#a0aec0; margin-top:10px; font-size:0.9rem;">No hay recursos recientes.</p>
+                    </div>
+
+                    <div class="docs-grid" *ngIf="!isLoadingRecent && recentResources.length > 0">
+                        <div class="doc-item" 
+                             *ngFor="let res of recentResources"
+                             (click)="goToCategory(res.id_category)"
+                             style="cursor:pointer;">
+                            <span class="material-icons">{{ getFileIcon(res.route) }}</span>
+                            <p>{{ res.name }}</p>
+                            <span class="file-type">{{ res.route.split('.').pop()?.toUpperCase() }}</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="resources-layout" *ngIf="currentSection === 'procesos'">
-                
+
                 <aside class="months-panel">
                     <h3 class="panel-title">Técnicas</h3>
                     <ul class="month-list">
-                        <li class="month-item" 
-                            [class.active]="currentProcessTab === 'entrevistas'"
+                        <li class="month-item" [class.active]="currentProcessTab === 'entrevistas'"
                             (click)="setProcessTab('entrevistas')">
                             <span class="month-name">Entrevistas</span>
                         </li>
-                        <li class="month-item"
-                            [class.active]="currentProcessTab === 'cuestionarios'"
+                        <li class="month-item" [class.active]="currentProcessTab === 'cuestionarios'"
                             (click)="setProcessTab('cuestionarios')">
                             <span class="month-name">Cuestionarios</span>
                         </li>
-                        <li class="month-item"
-                            [class.active]="currentProcessTab === 'observacion'"
+                        <li class="month-item" [class.active]="currentProcessTab === 'observacion'"
                             (click)="setProcessTab('observacion')"> <span class="month-name">Observación</span>
                         </li>
-                        <li class="month-item"
-                            [class.active]="currentProcessTab === 'historias'"
+                        <li class="month-item" [class.active]="currentProcessTab === 'historias'"
                             (click)="setProcessTab('historias')">
                             <span class="month-name">Historias de Usuario</span>
                         </li>
-                        <li class="month-item"
-                            [class.active]="currentProcessTab === 'focusgroup'"
+                        <li class="month-item" [class.active]="currentProcessTab === 'focusgroup'"
                             (click)="setProcessTab('focusgroup')">
                             <span class="month-name">Focus Group</span>
                         </li>
-                        <li class="month-item"
-                            [class.active]="currentProcessTab === 'documentos'"
+                        <li class="month-item" [class.active]="currentProcessTab === 'documentos'"
                             (click)="setProcessTab('documentos')">
                             <span class="month-name">Análisis de Documentos</span>
                         </li>
-                        <li class="month-item"
-                            [class.active]="currentProcessTab === 'transaccional'"
+                        <li class="month-item" [class.active]="currentProcessTab === 'transaccional'"
                             (click)="setProcessTab('transaccional')">
                             <span class="month-name">Seg. Transaccional</span>
                         </li>
@@ -275,13 +243,14 @@
                     </div>
 
                     <div class="modal-overlay" *ngIf="showInterviewModal">
-                        <div class="modal-container interview-modal"> <div class="modal-header">
+                        <div class="modal-container interview-modal">
+                            <div class="modal-header">
                                 <h3>Planificar Entrevista</h3>
                                 <button class="btn-close" (click)="closeModal()">
                                     <span class="material-icons">close</span>
                                 </button>
                             </div>
-                            
+
                             <div class="modal-body scrollable-body">
                                 <div class="form-row">
                                     <div class="form-group half">
@@ -298,28 +267,29 @@
 
                                 <div class="sections-container">
                                     <label class="section-label">Preguntas</label>
-                                    
-                                    <div class="question-section" *ngFor="let section of newInterview.sections; let i = index;">
+
+                                    <div class="question-section"
+                                        *ngFor="let section of newInterview.sections; let i = index;">
                                         <div class="section-header">
-                                            <input type="text" 
-                                                   class="section-title-input" 
-                                                   placeholder="Nombre de la Sección"
-                                                   [(ngModel)]="section.title">
-                                            <button class="btn-icon-danger" (click)="removeSection(i)" *ngIf="newInterview.sections.length > 1" title="Eliminar Sección">
+                                            <input type="text" class="section-title-input"
+                                                placeholder="Nombre de la Sección" [(ngModel)]="section.title">
+                                            <button class="btn-icon-danger" (click)="removeSection(i)"
+                                                *ngIf="newInterview.sections.length > 1" title="Eliminar Sección">
                                                 <span class="material-icons">delete</span>
                                             </button>
                                         </div>
 
                                         <div class="questions-list">
-                                            <div class="question-item" *ngFor="let q of section.questions; let j = index; trackBy: trackByIndex">
+                                            <div class="question-item"
+                                                *ngFor="let q of section.questions; let j = index; trackBy: trackByIndex">
                                                 <span class="q-number">{{j + 1}}.</span>
-                                                <input type="text" 
-                                                       class="question-input" 
-                                                       [(ngModel)]="section.questions[j]"> <button class="btn-icon-small" (click)="removeQuestion(i, j)" *ngIf="section.questions.length > 1">
+                                                <input type="text" class="question-input"
+                                                    [(ngModel)]="section.questions[j]"> <button class="btn-icon-small"
+                                                    (click)="removeQuestion(i, j)" *ngIf="section.questions.length > 1">
                                                     <span class="material-icons">close</span>
                                                 </button>
                                             </div>
-                                            
+
                                             <button class="btn-text-add" (click)="addQuestion(i)">
                                                 + Agregar pregunta
                                             </button>
@@ -364,13 +334,14 @@
                     </div>
 
                     <div class="modal-overlay" *ngIf="showQuestionModal">
-                        <div class="modal-container interview-modal"> <div class="modal-header">
+                        <div class="modal-container interview-modal">
+                            <div class="modal-header">
                                 <h3>Diseñar Cuestionario</h3>
                                 <button class="btn-close" (click)="closeModal()">
                                     <span class="material-icons">close</span>
                                 </button>
                             </div>
-                            
+
                             <div class="modal-body scrollable-body">
                                 <div class="form-group">
                                     <label>Título del Cuestionario</label>
@@ -385,31 +356,32 @@
 
                                 <div class="sections-container">
                                     <label class="section-label">Preguntas</label>
-                                    
-                                    <div class="question-card" *ngFor="let q of newQuestion.questions; let i = index; trackBy: trackByIndex">
-                                        
+
+                                    <div class="question-card"
+                                        *ngFor="let q of newQuestion.questions; let i = index; trackBy: trackByIndex">
+
                                         <div class="q-header-row">
                                             <div class="q-number-circle">{{i + 1}}</div>
-                                            <input type="text" 
-                                                   class="question-main-input" 
-                                                   placeholder="Pregunta aquí" 
-                                                   [(ngModel)]="q.text">
-                                            
+                                            <input type="text" class="question-main-input" placeholder="Pregunta aquí"
+                                                [(ngModel)]="q.text">
+
                                             <select class="type-select" [(ngModel)]="q.type">
                                                 <option value="open">Abierta</option>
                                                 <option value="closed">Si / No</option>
                                                 <option value="multiple">Opción Múltiple</option>
                                             </select>
 
-                                            <button class="btn-icon-danger" (click)="removeQuestionnaireQuestion(i)" title="Borrar pregunta">
+                                            <button class="btn-icon-danger" (click)="removeQuestionnaireQuestion(i)"
+                                                title="Borrar pregunta">
                                                 <span class="material-icons">delete</span>
                                             </button>
                                         </div>
 
                                         <div class="q-preview-area">
-                                            
+
                                             <div *ngIf="q.type === 'open'" class="preview-open">
-                                                <input type="text" disabled placeholder="El usuario escribirá su respuesta aquí...">
+                                                <input type="text" disabled
+                                                    placeholder="El usuario escribirá su respuesta aquí...">
                                             </div>
 
                                             <div *ngIf="q.type === 'closed'" class="preview-closed">
@@ -422,12 +394,11 @@
                                             </div>
 
                                             <div *ngIf="q.type === 'multiple'" class="options-editor">
-                                                <div class="option-row" *ngFor="let opt of q.options; let j = index; trackBy: trackByIndex">
+                                                <div class="option-row"
+                                                    *ngFor="let opt of q.options; let j = index; trackBy: trackByIndex">
                                                     <div class="fake-circle"></div>
-                                                    <input type="text" 
-                                                           class="option-input" 
-                                                           placeholder="Opción {{j + 1}}" 
-                                                           [(ngModel)]="q.options[j]">
+                                                    <input type="text" class="option-input"
+                                                        placeholder="Opción {{j + 1}}" [(ngModel)]="q.options[j]">
                                                     <button class="btn-icon-small" (click)="removeOption(i, j)">
                                                         <span class="material-icons">close</span>
                                                     </button>
@@ -457,187 +428,197 @@
                 </div>
 
                 <div class="resources-content" *ngIf="currentProcessTab === 'observacion'">
-                <div class="resources-header">
-                    <h2>Observaciones</h2>
-                    <button class="btn-add" (click)="openObservationModal()">
-                        <span class="material-icons">visibility</span>
-                        Nueva observación
-                    </button>
-                </div>
-
-                <div class="docs-grid">
-                    <div class="doc-item">
-                        <span class="material-icons">visibility</span>
-                        <p>Observación 1</p>
-                        <span class="file-type"></span>
+                    <div class="resources-header">
+                        <h2>Observaciones</h2>
+                        <button class="btn-add" (click)="openObservationModal()">
+                            <span class="material-icons">visibility</span>
+                            Nueva observación
+                        </button>
                     </div>
-                    <div class="doc-item">
-                        <span class="material-icons">visibility</span>
-                        <p>Observación 2</p>
-                        <span class="file-type"></span>
-                    </div>
-                </div>
 
-                <div class="modal-overlay" *ngIf="showObservationModal">
-                    <div class="modal-container interview-modal"> <div class="modal-header">
-                            <h3>Nueva Observación</h3>
-                            <button class="btn-close" (click)="closeModal()">
-                                <span class="material-icons">close</span>
-                            </button>
+                    <div class="docs-grid">
+                        <div class="doc-item">
+                            <span class="material-icons">visibility</span>
+                            <p>Observación 1</p>
+                            <span class="file-type"></span>
                         </div>
-                        
-                        <div class="modal-body scrollable-body">
-                            <div class="form-row">
-                                <div class="form-group" style="flex: 2;">
-                                    <label>Contexto / Observación</label>
-                                    <input type="text" 
-                                           [(ngModel)]="newObservation.context">
-                                </div>
-                                <div class="form-group" style="flex: 1;">
-                                    <label>Fecha</label>
-                                    <input type="date" [(ngModel)]="newObservation.date">
-                                </div>
+                        <div class="doc-item">
+                            <span class="material-icons">visibility</span>
+                            <p>Observación 2</p>
+                            <span class="file-type"></span>
+                        </div>
+                    </div>
+
+                    <div class="modal-overlay" *ngIf="showObservationModal">
+                        <div class="modal-container interview-modal">
+                            <div class="modal-header">
+                                <h3>Nueva Observación</h3>
+                                <button class="btn-close" (click)="closeModal()">
+                                    <span class="material-icons">close</span>
+                                </button>
                             </div>
 
-                            <hr class="divider">
+                            <div class="modal-body scrollable-body">
+                                <div class="form-row">
+                                    <div class="form-group" style="flex: 2;">
+                                        <label>Contexto / Observación</label>
+                                        <input type="text" [(ngModel)]="newObservation.context">
+                                    </div>
+                                    <div class="form-group" style="flex: 1;">
+                                        <label>Fecha</label>
+                                        <input type="date" [(ngModel)]="newObservation.date">
+                                    </div>
+                                </div>
 
-                            <div class="sections-container">
-                                <label class="section-label">Hallazgos y Comentarios</label>
-                                <p style="font-size: 0.85rem; color: #718096; margin-bottom: 15px;">
-                                    Registro del evento significativo que se haya observado
-                                </p>
-                                
-                                <div class="questions-list">
-                                    <div class="question-item" *ngFor="let note of newObservation.notes; let i = index; trackBy: trackByIndex">
-                                        <span class="material-icons" style="color: #a0aec0; font-size: 20px;">fiber_manual_record</span>
-                                        
-                                        <input type="text" 
-                                               class="question-input" 
-                                               [(ngModel)]="newObservation.notes[i]"> 
-                                        
-                                        <button class="btn-icon-small" (click)="removeObservationNote(i)" *ngIf="newObservation.notes.length > 1">
-                                            <span class="material-icons">close</span>
+                                <hr class="divider">
+
+                                <div class="sections-container">
+                                    <label class="section-label">Hallazgos y Comentarios</label>
+                                    <p style="font-size: 0.85rem; color: #718096; margin-bottom: 15px;">
+                                        Registro del evento significativo que se haya observado
+                                    </p>
+
+                                    <div class="questions-list">
+                                        <div class="question-item"
+                                            *ngFor="let note of newObservation.notes; let i = index; trackBy: trackByIndex">
+                                            <span class="material-icons"
+                                                style="color: #a0aec0; font-size: 20px;">fiber_manual_record</span>
+
+                                            <input type="text" class="question-input"
+                                                [(ngModel)]="newObservation.notes[i]">
+
+                                            <button class="btn-icon-small" (click)="removeObservationNote(i)"
+                                                *ngIf="newObservation.notes.length > 1">
+                                                <span class="material-icons">close</span>
+                                            </button>
+                                        </div>
+
+                                        <button class="btn-text-add" (click)="addObservationNote()">
+                                            + Agregar nota
                                         </button>
                                     </div>
-                                    
-                                    <button class="btn-text-add" (click)="addObservationNote()">
-                                        + Agregar nota
-                                    </button>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="modal-footer">
-                            <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
-                            <button class="btn-save" (click)="closeModal()">Guardar Observaciones</button>
+                            <div class="modal-footer">
+                                <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+                                <button class="btn-save" (click)="closeModal()">Guardar Observaciones</button>
+                            </div>
                         </div>
                     </div>
-                </div>
                 </div>
 
                 <div class="resources-content" *ngIf="currentProcessTab === 'historias'">
-                <div class="resources-header">
-                    <h2>Backlog de Historias</h2>
-                    <button class="btn-add" (click)="openStoryModal()">
-                        <span class="material-icons">post_add</span>
-                        Nueva Historia
-                    </button>
-                </div>
-
-                <div class="docs-grid">
-                    <div class="doc-item">
-                        <span class="material-icons">view_kanban</span>
-                        <p>HU-01: Login Seguro</p>
-                        <span class="file-type">ALTA PRIORIDAD</span>
+                    <div class="resources-header">
+                        <h2>Backlog de Historias</h2>
+                        <button class="btn-add" (click)="openStoryModal()">
+                            <span class="material-icons">post_add</span>
+                            Nueva Historia
+                        </button>
                     </div>
-                    <div class="doc-item">
-                        <span class="material-icons">view_kanban</span>
-                        <p>HU-02: Exportar PDF</p>
-                        <span class="file-type">PRIORIDAD MEDIA</span>
-                    </div>
-                </div>
 
-                <div class="modal-overlay" *ngIf="showStoryModal">
-                    <div class="modal-container interview-modal"> <div class="modal-header">
-                            <h3>Redactar Historia de Usuario</h3>
-                            <button class="btn-close" (click)="closeModal()">
-                                <span class="material-icons">close</span>
-                            </button>
+                    <div class="docs-grid">
+                        <div class="doc-item">
+                            <span class="material-icons">view_kanban</span>
+                            <p>HU-01: Login Seguro</p>
+                            <span class="file-type">ALTA PRIORIDAD</span>
                         </div>
-                        
-                        <div class="modal-body scrollable-body">
-                            
-                            <div class="form-row">
-                                <div class="form-group" style="flex: 1;">
-                                    <label>Identificador</label>
-                                    <input type="text" [(ngModel)]="newStory.identifier">
-                                </div>
-                                <div class="form-group" style="flex: 2;">
-                                    <label>Título Breve</label>
-                                    <input type="text" [(ngModel)]="newStory.title">
-                                </div>
-                                <div class="form-group" style="flex: 1;">
-                                    <label>Prioridad</label>
-                                    <select class="type-select" style="width: 100%; padding: 10px;" [(ngModel)]="newStory.priority">
-                                        <option value="Alta">Alta</option>
-                                        <option value="Media">Media</option>
-                                        <option value="Baja">Baja</option>
-                                    </select>
-                                </div>
+                        <div class="doc-item">
+                            <span class="material-icons">view_kanban</span>
+                            <p>HU-02: Exportar PDF</p>
+                            <span class="file-type">PRIORIDAD MEDIA</span>
+                        </div>
+                    </div>
+
+                    <div class="modal-overlay" *ngIf="showStoryModal">
+                        <div class="modal-container interview-modal">
+                            <div class="modal-header">
+                                <h3>Redactar Historia de Usuario</h3>
+                                <button class="btn-close" (click)="closeModal()">
+                                    <span class="material-icons">close</span>
+                                </button>
                             </div>
 
-                            <hr class="divider">
+                            <div class="modal-body scrollable-body">
 
-                            <div class="sections-container" style="background-color: #f7fafc; padding: 15px; border-radius: 8px; border: 1px solid #edf2f7; margin-bottom: 20px;">
-                                <label class="section-label" style="color: #319795;">Narrativa</label>
-                                
-                                <div class="form-group">
-                                    <label>¿Cómo?</label>
-                                    <input type="text" [(ngModel)]="newStory.role" style="border-left: 3px solid #4ed9d9;">
+                                <div class="form-row">
+                                    <div class="form-group" style="flex: 1;">
+                                        <label>Identificador</label>
+                                        <input type="text" [(ngModel)]="newStory.identifier">
+                                    </div>
+                                    <div class="form-group" style="flex: 2;">
+                                        <label>Título Breve</label>
+                                        <input type="text" [(ngModel)]="newStory.title">
+                                    </div>
+                                    <div class="form-group" style="flex: 1;">
+                                        <label>Prioridad</label>
+                                        <select class="type-select" style="width: 100%; padding: 10px;"
+                                            [(ngModel)]="newStory.priority">
+                                            <option value="Alta">Alta</option>
+                                            <option value="Media">Media</option>
+                                            <option value="Baja">Baja</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label>¿Qué quiero?</label>
-                                    <input type="text" [(ngModel)]="newStory.action" style="border-left: 3px solid #4ed9d9;">
-                                </div>
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label>¿Para que lo quiero?</label>
-                                    <input type="text" [(ngModel)]="newStory.benefit" style="border-left: 3px solid #4ed9d9;">
-                                </div>
-                            </div>
 
-                            <div class="sections-container">
-                                <label class="section-label">Criterios de Aceptación</label>
-                                <p style="font-size: 0.85rem; color: #718096; margin-bottom: 15px;">
-                                    Condiciones que debe cumplir la historia para considerarse terminada
-                                </p>
-                                
-                                <div class="questions-list">
-                                    <div class="question-item" *ngFor="let crit of newStory.criteria; let i = index; trackBy: trackByIndex">
-                                        <span class="material-icons" style="color: #4ed9d9; font-size: 20px;">check_box</span>
-                                        
-                                        <input type="text" 
-                                               class="question-input" 
-                                               [(ngModel)]="newStory.criteria[i]"> 
-                                        
-                                        <button class="btn-icon-small" (click)="removeCriterion(i)" *ngIf="newStory.criteria.length > 1">
-                                            <span class="material-icons">close</span>
+                                <hr class="divider">
+
+                                <div class="sections-container"
+                                    style="background-color: #f7fafc; padding: 15px; border-radius: 8px; border: 1px solid #edf2f7; margin-bottom: 20px;">
+                                    <label class="section-label" style="color: #319795;">Narrativa</label>
+
+                                    <div class="form-group">
+                                        <label>¿Cómo?</label>
+                                        <input type="text" [(ngModel)]="newStory.role"
+                                            style="border-left: 3px solid #4ed9d9;">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>¿Qué quiero?</label>
+                                        <input type="text" [(ngModel)]="newStory.action"
+                                            style="border-left: 3px solid #4ed9d9;">
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label>¿Para que lo quiero?</label>
+                                        <input type="text" [(ngModel)]="newStory.benefit"
+                                            style="border-left: 3px solid #4ed9d9;">
+                                    </div>
+                                </div>
+
+                                <div class="sections-container">
+                                    <label class="section-label">Criterios de Aceptación</label>
+                                    <p style="font-size: 0.85rem; color: #718096; margin-bottom: 15px;">
+                                        Condiciones que debe cumplir la historia para considerarse terminada
+                                    </p>
+
+                                    <div class="questions-list">
+                                        <div class="question-item"
+                                            *ngFor="let crit of newStory.criteria; let i = index; trackBy: trackByIndex">
+                                            <span class="material-icons"
+                                                style="color: #4ed9d9; font-size: 20px;">check_box</span>
+
+                                            <input type="text" class="question-input"
+                                                [(ngModel)]="newStory.criteria[i]">
+
+                                            <button class="btn-icon-small" (click)="removeCriterion(i)"
+                                                *ngIf="newStory.criteria.length > 1">
+                                                <span class="material-icons">close</span>
+                                            </button>
+                                        </div>
+
+                                        <button class="btn-text-add" (click)="addCriterion()">
+                                            + Agregar criterio
                                         </button>
                                     </div>
-                                    
-                                    <button class="btn-text-add" (click)="addCriterion()">
-                                        + Agregar criterio
-                                    </button>
                                 </div>
+
                             </div>
 
-                        </div>
-
-                        <div class="modal-footer">
-                            <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
-                            <button class="btn-save" (click)="closeModal()">Guardar Historia</button>
+                            <div class="modal-footer">
+                                <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+                                <button class="btn-save" (click)="closeModal()">Guardar Historia</button>
+                            </div>
                         </div>
                     </div>
-                </div>
                 </div>
 
                 <div class="resources-content" *ngIf="currentProcessTab === 'focusgroup'">
@@ -663,15 +644,16 @@
                     </div>
 
                     <div class="modal-overlay" *ngIf="showFocusGroupModal">
-                        <div class="modal-container interview-modal"> <div class="modal-header">
+                        <div class="modal-container interview-modal">
+                            <div class="modal-header">
                                 <h3>Registrar Focus Group</h3>
                                 <button class="btn-close" (click)="closeModal()">
                                     <span class="material-icons">close</span>
                                 </button>
                             </div>
-                            
+
                             <div class="modal-body scrollable-body">
-                                
+
                                 <div class="form-row">
                                     <div class="form-group" style="flex: 2;">
                                         <label>Tema de Discusión</label>
@@ -688,19 +670,20 @@
                                 <div class="form-row">
                                     <div class="sections-container" style="flex: 1; margin-bottom: 0;">
                                         <label class="section-label">Participantes</label>
-                                        
+
                                         <div class="questions-list">
-                                            <div class="question-item" *ngFor="let p of newFocusGroup.participants; let i = index; trackBy: trackByIndex">
+                                            <div class="question-item"
+                                                *ngFor="let p of newFocusGroup.participants; let i = index; trackBy: trackByIndex">
                                                 <span class="material-icons">person</span>
-                                                <input type="text" 
-                                                    class="question-input" 
-                                                    placeholder="Nombre"
-                                                    [(ngModel)]="newFocusGroup.participants[i]"> 
-                                                <button class="btn-icon-small" (click)="removeParticipant(i)" *ngIf="newFocusGroup.participants.length > 1">
+                                                <input type="text" class="question-input" placeholder="Nombre"
+                                                    [(ngModel)]="newFocusGroup.participants[i]">
+                                                <button class="btn-icon-small" (click)="removeParticipant(i)"
+                                                    *ngIf="newFocusGroup.participants.length > 1">
                                                     <span class="material-icons">close</span>
                                                 </button>
                                             </div>
-                                            <button class="btn-text-add" (click)="addParticipant()" style="padding-left: 25px;">
+                                            <button class="btn-text-add" (click)="addParticipant()"
+                                                style="padding-left: 25px;">
                                                 + Añadir participante
                                             </button>
                                         </div>
@@ -708,15 +691,15 @@
 
                                     <div class="sections-container" style="flex: 1.5; margin-bottom: 0;">
                                         <label class="section-label">Lluvia de Ideas / Conclusiones</label>
-                                        
+
                                         <div class="questions-list">
-                                            <div class="question-item" *ngFor="let idea of newFocusGroup.ideas; let i = index; trackBy: trackByIndex">
+                                            <div class="question-item"
+                                                *ngFor="let idea of newFocusGroup.ideas; let i = index; trackBy: trackByIndex">
                                                 <span class="material-icons">emoji_objects</span>
-                                                <input type="text" 
-                                                    class="question-input" 
-                                                    placeholder="Idea generada"
-                                                    [(ngModel)]="newFocusGroup.ideas[i]"> 
-                                                <button class="btn-icon-small" (click)="removeIdea(i)" *ngIf="newFocusGroup.ideas.length > 1">
+                                                <input type="text" class="question-input" placeholder="Idea generada"
+                                                    [(ngModel)]="newFocusGroup.ideas[i]">
+                                                <button class="btn-icon-small" (click)="removeIdea(i)"
+                                                    *ngIf="newFocusGroup.ideas.length > 1">
                                                     <span class="material-icons">close</span>
                                                 </button>
                                             </div>
@@ -760,23 +743,28 @@
                     </div>
 
                     <div class="modal-overlay" *ngIf="showDocumentModal">
-                        <div class="modal-container"> <div class="modal-header">
+                        <div class="modal-container">
+                            <div class="modal-header">
                                 <h3>Subir Documento de Referencia</h3>
                                 <button class="btn-close" (click)="closeModal()">
                                     <span class="material-icons">close</span>
                                 </button>
                             </div>
-                            
+
                             <div class="modal-body">
-                                
+
                                 <label class="upload-zone">
                                     <span class="material-icons">cloud_upload</span>
                                     <p *ngIf="!newDocument.fileName">Haz clic o arrastra un archivo aquí</p>
-                                    <p *ngIf="!newDocument.fileName" style="font-size: 0.8rem; color: #a0aec0; margin-top: 5px;">PDF, DOCX, XLSX (Max 10MB)</p>
-                                    
+                                    <p *ngIf="!newDocument.fileName"
+                                        style="font-size: 0.8rem; color: #a0aec0; margin-top: 5px;">PDF, DOCX, XLSX (Max
+                                        10MB)</p>
+
                                     <div *ngIf="newDocument.fileName" class="selected-file">
-                                        <span class="material-icons" style="color: #38b2ac; font-size: 24px; margin-bottom: 0;">check_circle</span>
-                                        <p style="color: #319795; font-weight: bold; margin-top: 5px;">{{ newDocument.fileName }}</p>
+                                        <span class="material-icons"
+                                            style="color: #38b2ac; font-size: 24px; margin-bottom: 0;">check_circle</span>
+                                        <p style="color: #319795; font-weight: bold; margin-top: 5px;">{{
+                                            newDocument.fileName }}</p>
                                     </div>
 
                                     <input type="file" class="hidden-file-input" (change)="onFileSelected($event)">
@@ -798,7 +786,9 @@
 
                             <div class="modal-footer">
                                 <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
-                                <button class="btn-save" [disabled]="!newDocument.fileName" [style.opacity]="!newDocument.fileName ? '0.5' : '1'" (click)="closeModal()">Guardar Documento</button>
+                                <button class="btn-save" [disabled]="!newDocument.fileName"
+                                    [style.opacity]="!newDocument.fileName ? '0.5' : '1'" (click)="closeModal()">Guardar
+                                    Documento</button>
                             </div>
                         </div>
                     </div>
@@ -827,15 +817,16 @@
                     </div>
 
                     <div class="modal-overlay" *ngIf="showTransactionModal">
-                        <div class="modal-container interview-modal"> <div class="modal-header">
+                        <div class="modal-container interview-modal">
+                            <div class="modal-header">
                                 <h3>Rastrear Transacción</h3>
                                 <button class="btn-close" (click)="closeModal()">
                                     <span class="material-icons">close</span>
                                 </button>
                             </div>
-                            
+
                             <div class="modal-body scrollable-body">
-                                
+
                                 <div class="form-row">
                                     <div class="form-group" style="flex: 2;">
                                         <label>Nombre de la Transacción</label>
@@ -849,24 +840,26 @@
 
                                 <hr class="divider">
 
-                                <div class="sections-container" style="background-color: #f7fafc; padding: 15px; border-radius: 8px; border: 1px solid #edf2f7; margin-bottom: 20px;">
+                                <div class="sections-container"
+                                    style="background-color: #f7fafc; padding: 15px; border-radius: 8px; border: 1px solid #edf2f7; margin-bottom: 20px;">
                                     <label class="section-label">
                                         <span class="material-icons">format_list_numbered</span> Secuencia de Pasos
                                     </label>
-                                    
+
                                     <div class="questions-list">
-                                        <div class="question-item" *ngFor="let step of newTransaction.steps; let i = index; trackBy: trackByIndex">
+                                        <div class="question-item"
+                                            *ngFor="let step of newTransaction.steps; let i = index; trackBy: trackByIndex">
                                             <span class="q-number">{{i + 1}}.</span>
-                                            
-                                            <input type="text" 
-                                                class="question-input"
-                                                [(ngModel)]="newTransaction.steps[i]"> 
-                                            
-                                            <button class="btn-icon-small" (click)="removeTransactionStep(i)" *ngIf="newTransaction.steps.length > 1">
+
+                                            <input type="text" class="question-input"
+                                                [(ngModel)]="newTransaction.steps[i]">
+
+                                            <button class="btn-icon-small" (click)="removeTransactionStep(i)"
+                                                *ngIf="newTransaction.steps.length > 1">
                                                 <span class="material-icons">close</span>
                                             </button>
                                         </div>
-                                        
+
                                         <button class="btn-text-add" (click)="addTransactionStep()">
                                             + Agregar siguiente paso
                                         </button>
@@ -875,7 +868,8 @@
 
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label>Resultado / Salida del Sistema</label>
-                                    <input type="text" [(ngModel)]="newTransaction.result" style="border-left: 3px solid #38b2ac;">
+                                    <input type="text" [(ngModel)]="newTransaction.result"
+                                        style="border-left: 3px solid #38b2ac;">
                                 </div>
 
                             </div>
@@ -891,50 +885,160 @@
 
             <div class="resources-layout" *ngIf="currentSection === 'recursos'">
                 <aside class="months-panel">
-                    <h3 class="panel-title">Historial 2026</h3>
-                    <ul class="month-list">
-                        <li class="month-item">Enero</li>
-                        <li class="month-item">Febrero</li>
-                        <li class="month-item">Marzo</li>
-                        <li class="month-item active">
-                            <span class="month-name">Abril</span>
-                            <ul class="sub-list">
-                                <li>Entregables</li>
-                                <li>Código fuente</li>
-                                <li>Assets</li>
-                            </ul>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                        <h3 class="panel-title" style="margin-bottom:0;">Categorías</h3>
+                        <button class="btn-add" style="padding:4px 10px; font-size:0.8rem;" (click)="showNewCategoryModal=true; categoryError=null">
+                            <span class="material-icons" style="font-size:16px;">add</span>
+                        </button>
+                    </div>
+
+                    <div *ngIf="!selectedProject" style="color:#a0aec0; font-size:0.85rem;">Selecciona un proyecto primero.</div>
+
+                    <div *ngIf="isLoadingCategories" style="text-align:center; padding:20px 0;">
+                        <span class="material-icons" style="font-size:32px; color:#38b2ac; animation: spin 1s linear infinite;">autorenew</span>
+                    </div>
+
+                    <div *ngIf="categoryError" style="color:#e53e3e; font-size:0.8rem; margin-bottom:8px;">{{ categoryError }}</div>
+
+                    <ul class="month-list" *ngIf="!isLoadingCategories && selectedProject">
+                        <li *ngIf="categories.length === 0" style="color:#a0aec0; font-size:0.85rem; padding:10px 0;">Sin categorías</li>
+                        <li class="month-item"
+                            *ngFor="let cat of categories"
+                            [class.active]="selectedCategory?.id === cat.id"
+                            (click)="selectCategory(cat)"
+                            style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                            <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ cat.name }}</span>
+                            <div style="display:flex; gap:2px; flex-shrink:0;" (click)="$event.stopPropagation()">
+                                <button class="btn-icon-small" title="Editar" (click)="selectedCategory=cat; openEditCategory(cat)">
+                                    <span class="material-icons" style="font-size:16px;">edit</span>
+                                </button>
+                                <button class="btn-icon-small" title="Eliminar" (click)="deleteCategory(cat)">
+                                    <span class="material-icons" style="font-size:16px; color:#e53e3e;">delete</span>
+                                </button>
+                            </div>
                         </li>
-                        <li class="month-item">Mayo</li>
                     </ul>
                 </aside>
 
                 <div class="resources-content">
                     <div class="resources-header">
-                        <h2>Recursos de Abril</h2>
-                        <button class="btn-add">
-                            <span class="material-icons">add</span>
-                            Añadir recurso
+                        <h2>{{ selectedCategory ? selectedCategory.name : 'Selecciona una categoría' }}</h2>
+                        <button class="btn-add" *ngIf="selectedCategory" (click)="showUploadModal=true; resourceError=null">
+                            <span class="material-icons">upload_file</span>
+                            Subir recurso
                         </button>
                     </div>
 
-                    <div class="docs-grid">
-                        <div class="doc-item">
-                            <span class="material-icons">folder_zip</span>
-                            <p>Proyecto_Final.zip</p>
-                            <span class="file-type">ZIP</span>
+                    <div *ngIf="!selectedCategory" style="text-align:center; padding:60px 0;">
+                        <span class="material-icons" style="font-size:48px; color:#cbd5e0;">folder_open</span>
+                        <p style="color:#a0aec0; margin-top:15px;">Selecciona o crea una categoría para ver sus recursos.</p>
+                    </div>
+
+                    <div *ngIf="isLoadingResources" style="text-align:center; padding:40px 0;">
+                        <span class="material-icons" style="font-size:40px; color:#38b2ac; animation: spin 1s linear infinite;">autorenew</span>
+                    </div>
+
+                    <div *ngIf="resourceError" style="color:#e53e3e; margin-bottom:12px;">{{ resourceError }}</div>
+
+                    <div class="docs-grid" *ngIf="selectedCategory && !isLoadingResources">
+                        <div *ngIf="resources.length === 0" style="color:#a0aec0; grid-column:1/-1; text-align:center; padding:40px 0;">
+                            <span class="material-icons" style="font-size:40px;">inbox</span>
+                            <p style="margin-top:10px;">No hay recursos en esta categoría.</p>
                         </div>
-                        <div class="doc-item">
-                            <span class="material-icons">picture_as_pdf</span>
-                            <p>Reporte_Abril.pdf</p>
-                            <span class="file-type">PDF</span>
+                        <div class="doc-item" *ngFor="let res of resources">
+                            <span class="material-icons">{{ getFileIcon(res.route) }}</span>
+                            <p>{{ res.name }}</p>
+                            <span class="file-type">{{ res.route.split('.').pop()?.toUpperCase() }}</span>
+                            <div style="display:flex; gap:6px; margin-top:8px;">
+                                <a [href]="'http://localhost:3000' + res.route" target="_blank" class="btn-icon-small" title="Descargar">
+                                    <span class="material-icons" style="font-size:18px; color:#38b2ac;">download</span>
+                                </a>
+                                <button class="btn-icon-small" title="Eliminar" (click)="deleteResource(res)">
+                                    <span class="material-icons" style="font-size:18px; color:#e53e3e;">delete</span>
+                                </button>
+                            </div>
                         </div>
-                        <div class="doc-item">
-                            <span class="material-icons">image</span>
-                            <p>Evidencia_01.jpg</p>
-                            <span class="file-type">JPG</span>
+                    </div>
+                </div>
+
+                <div class="modal-overlay" *ngIf="showNewCategoryModal">
+                    <div class="modal-container">
+                        <div class="modal-header">
+                            <h3>Nueva Categoría</h3>
+                            <button class="btn-close" (click)="showNewCategoryModal=false"><span class="material-icons">close</span></button>
                         </div>
-                        <div class="doc-item placeholder-item">
-                            <span class="material-icons">more_horiz</span>
+                        <div class="modal-body">
+                            <div *ngIf="categoryError" style="color:#e53e3e; margin-bottom:12px;">{{ categoryError }}</div>
+                            <div class="form-group">
+                                <label>Nombre</label>
+                                <input type="text" [(ngModel)]="newCategory.name" placeholder="Nombre de la categoría">
+                            </div>
+                            <div class="form-group">
+                                <label>Descripción (opcional)</label>
+                                <textarea rows="2" [(ngModel)]="newCategory.description"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn-cancel" (click)="showNewCategoryModal=false" [disabled]="isSavingCategory">Cancelar</button>
+                            <button class="btn-save" (click)="createCategory()" [disabled]="!newCategory.name.trim() || isSavingCategory">
+                                {{ isSavingCategory ? 'Creando...' : 'Crear' }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-overlay" *ngIf="showEditCategoryModal">
+                    <div class="modal-container">
+                        <div class="modal-header">
+                            <h3>Editar Categoría</h3>
+                            <button class="btn-close" (click)="showEditCategoryModal=false"><span class="material-icons">close</span></button>
+                        </div>
+                        <div class="modal-body">
+                            <div *ngIf="categoryError" style="color:#e53e3e; margin-bottom:12px;">{{ categoryError }}</div>
+                            <div class="form-group">
+                                <label>Nombre</label>
+                                <input type="text" [(ngModel)]="editCategory.name">
+                            </div>
+                            <div class="form-group">
+                                <label>Descripción</label>
+                                <textarea rows="2" [(ngModel)]="editCategory.description"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn-cancel" (click)="showEditCategoryModal=false" [disabled]="isSavingCategory">Cancelar</button>
+                            <button class="btn-save" (click)="saveEditCategory()" [disabled]="!editCategory.name.trim() || isSavingCategory">
+                                {{ isSavingCategory ? 'Guardando...' : 'Guardar' }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-overlay" *ngIf="showUploadModal">
+                    <div class="modal-container">
+                        <div class="modal-header">
+                            <h3>Subir Recurso</h3>
+                            <button class="btn-close" (click)="showUploadModal=false"><span class="material-icons">close</span></button>
+                        </div>
+                        <div class="modal-body">
+                            <div *ngIf="resourceError" style="color:#e53e3e; margin-bottom:12px;">{{ resourceError }}</div>
+                            <div class="form-group">
+                                <label>Nombre del recurso</label>
+                                <input type="text" [(ngModel)]="newResource.name" placeholder="Nombre descriptivo">
+                            </div>
+                            <div class="form-group">
+                                <label>Descripción (opcional)</label>
+                                <textarea rows="2" [(ngModel)]="newResource.description"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Archivo</label>
+                                <input type="file" (change)="onFileSelected($event)" style="padding:6px 0;">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn-cancel" (click)="showUploadModal=false" [disabled]="isUploadingResource">Cancelar</button>
+                            <button class="btn-save" (click)="uploadResource()" [disabled]="!newResource.name.trim() || !selectedFile || isUploadingResource">
+                                {{ isUploadingResource ? 'Subiendo...' : 'Subir' }}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1011,73 +1115,76 @@
                     <h2>Configuración del Proyecto</h2>
                 </div>
 
-                <div class="config-container">
-                    
+                <div *ngIf="!selectedProject" style="text-align: center; padding: 60px 0;">
+                    <span class="material-icons" style="font-size: 48px; color: #cbd5e0;">info</span>
+                    <p style="color: #a0aec0; margin-top: 15px;">Selecciona un proyecto desde Inicio para configurarlo.</p>
+                </div>
+
+                <div class="config-container" *ngIf="selectedProject">
+
+                    <div *ngIf="configError" style="background: rgba(220, 53, 69, 0.1); color: #e53e3e; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+                        {{ configError }}
+                    </div>
+
                     <div class="question-card">
-                        <h3 class="section-label" style="border-bottom: 1px solid #edf2f7; padding-bottom: 10px; margin-bottom: 20px;">
-                            <span class="material-icons" style="vertical-align: bottom; margin-right: 5px; color: #a0aec0;">tune</span>
+                        <h3 class="section-label"
+                            style="border-bottom: 1px solid #edf2f7; padding-bottom: 10px; margin-bottom: 20px;">
+                            <span class="material-icons"
+                                style="vertical-align: bottom; margin-right: 5px; color: #a0aec0;">tune</span>
                             Detalles Generales
                         </h3>
-                        
+
                         <div class="form-group">
                             <label>Nombre del Proyecto</label>
                             <input type="text" [(ngModel)]="configProject.name">
                         </div>
-                        
+
                         <div class="form-group">
                             <label>Descripción</label>
                             <textarea rows="3" [(ngModel)]="configProject.description"></textarea>
                         </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group" style="flex: 1;">
-                                <label>Fecha de Inicio</label>
-                                <input type="date" [(ngModel)]="configProject.startDate">
-                            </div>
-                            <div class="form-group" style="flex: 1;">
-                                <label>Estado del Proyecto</label>
-                                <select class="type-select" style="width: 100%; padding: 10px;" [(ngModel)]="configProject.status">
-                                    <option value="activo">Activo</option>
-                                    <option value="pausado">Pausado</option>
-                                    <option value="completado">Completado</option>
-                                </select>
-                            </div>
+
+                        <div class="form-group">
+                            <label>Fecha de Entrega</label>
+                            <input type="date" [(ngModel)]="configProject.deadline">
                         </div>
 
                         <div style="text-align: right; margin-top: 15px;">
-                            <button class="btn-save">Guardar Cambios</button>
+                            <button class="btn-save"
+                                    (click)="saveProjectConfig()"
+                                    [disabled]="!configProject.name.trim() || isSavingConfig">
+                                {{ isSavingConfig ? 'Guardando...' : 'Guardar Cambios' }}
+                            </button>
                         </div>
                     </div>
 
                     <div class="question-card danger-zone">
-                        <h3 class="section-label" style="color: #e53e3e; border-bottom: 1px solid #fed7d7; padding-bottom: 10px; margin-bottom: 20px;">
-                            <span class="material-icons" style="vertical-align: bottom; margin-right: 5px;">warning</span>
-                            Peligro we
+                        <h3 class="section-label"
+                            style="color: #e53e3e; border-bottom: 1px solid #fed7d7; padding-bottom: 10px; margin-bottom: 20px;">
+                            <span class="material-icons"
+                                style="vertical-align: bottom; margin-right: 5px;">warning</span>
+                            Peligro
                         </h3>
-                        
-                        <div class="danger-item">
-                            <div>
-                                <strong>Archivar Proyecto</strong>
-                            </div>
-                            <button class="btn-cancel">Archivar</button>
-                        </div>
-                        
-                        <hr class="divider">
-                        
+
                         <div class="danger-item">
                             <div>
                                 <strong>Eliminar Proyecto</strong>
+                                <p style="font-size: 0.85rem; color: #718096; margin-top: 4px;">Esta acción no se puede deshacer.</p>
                             </div>
-                            <button class="btn-danger">Eliminar</button>
+                            <button class="btn-danger"
+                                    (click)="deleteCurrentProject()"
+                                    [disabled]="isDeletingProject">
+                                {{ isDeletingProject ? 'Eliminando...' : 'Eliminar' }}
+                            </button>
                         </div>
                     </div>
 
                 </div>
             </div>
 
-        <div *ngIf="currentSection !== 'dashboard' && currentSection !== 'recursos' && currentSection !== 'equipo' 
+            <div *ngIf="currentSection !== 'dashboard' && currentSection !== 'recursos' && currentSection !== 'equipo' 
         && currentSection !== 'home' && currentSection !== 'procesos' && currentSection !== 'configuracion'"
-                 style="text-align: center; padding-top: 50px;">
+                style="text-align: center; padding-top: 50px;">
                 <span class="material-icons" style="font-size: 48px; color: #cbd5e0;">construction</span>
                 <p style="color: #a0aec0; margin-top: 10px;">Esta sección está en desarrollo.</p>
             </div>
