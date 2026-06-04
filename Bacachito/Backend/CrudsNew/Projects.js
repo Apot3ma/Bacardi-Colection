@@ -35,18 +35,21 @@ router.get('/:id_user', async (req, res) => {
     const { id_user } = req.params;
     try {
         const [result] = await pool.query(
-            'SELECT id, `name`, description, deadline FROM project WHERE id_user = ?',
-            [id_user]
+            `SELECT id, name, id_user, description, deadline 
+             FROM project 
+             WHERE id_user = ? 
+             OR id IN (SELECT id_project FROM user_log_project WHERE id_user = ?)`,
+            [id_user, id_user]
         );
+
         if (result.length === 0) {
-            return res.status(404).json({ error: 'no se encontro ningun Proyecto' });
+            return res.status(404).json({ error: 'No se encontró ningún Proyecto' });
         }
         res.json(result);
     } catch (err) {
         res.status(500).json({ error: 'Error', details: err.message });
     }
 });
-
 
 // =======================================
 // ==ACTUALIZAR MIS PROYECTOS COMO OWNER==

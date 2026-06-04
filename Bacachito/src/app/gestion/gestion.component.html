@@ -887,7 +887,7 @@
                 <aside class="months-panel">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
                         <h3 class="panel-title" style="margin-bottom:0;">Categorías</h3>
-                        <button class="btn-add" style="padding:4px 10px; font-size:0.8rem;" (click)="showNewCategoryModal=true; categoryError=null">
+                        <button class="btn-add" style="padding:4px 10px; font-size:0.8rem;" (click)="showNewCategoryModal=true; categoryError=null" *ngIf="isProjectLeader()">
                             <span class="material-icons" style="font-size:16px;">add</span>
                         </button>
                     </div>
@@ -908,7 +908,7 @@
                             (click)="selectCategory(cat)"
                             style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
                             <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ cat.name }}</span>
-                            <div style="display:flex; gap:2px; flex-shrink:0;" (click)="$event.stopPropagation()">
+                            <div style="display:flex; gap:2px; flex-shrink:0;" (click)="$event.stopPropagation()" *ngIf="isProjectLeader()">
                                 <button class="btn-icon-small" title="Editar" (click)="selectedCategory=cat; openEditCategory(cat)">
                                     <span class="material-icons" style="font-size:16px;">edit</span>
                                 </button>
@@ -923,10 +923,16 @@
                 <div class="resources-content">
                     <div class="resources-header">
                         <h2>{{ selectedCategory ? selectedCategory.name : 'Selecciona una categoría' }}</h2>
-                        <button class="btn-add" *ngIf="selectedCategory" (click)="showUploadModal=true; resourceError=null">
-                            <span class="material-icons">upload_file</span>
-                            Subir recurso
-                        </button>
+                        <div style="display:flex;gap:8px;" *ngIf="selectedCategory">
+                            <button class="btn-add" (click)="openPermissionsModal()" *ngIf="isProjectLeader()">
+                                <span class="material-icons">lock</span>
+                                Permisos
+                            </button>
+                            <button class="btn-add" (click)="showUploadModal=true; resourceError=null" *ngIf="canCreateCategory()">
+                                <span class="material-icons">upload_file</span>
+                                Subir recurso
+                            </button>
+                        </div>
                     </div>
 
                     <div *ngIf="!selectedCategory" style="text-align:center; padding:60px 0;">
@@ -953,7 +959,7 @@
                                 <a [href]="'http://localhost:3000' + res.route" target="_blank" class="btn-icon-small" title="Descargar">
                                     <span class="material-icons" style="font-size:18px; color:#38b2ac;">download</span>
                                 </a>
-                                <button class="btn-icon-small" title="Eliminar" (click)="deleteResource(res)">
+                                <button class="btn-icon-small" title="Eliminar" (click)="deleteResource(res)" *ngIf="canEditCategory()">
                                     <span class="material-icons" style="font-size:18px; color:#e53e3e;">delete</span>
                                 </button>
                             </div>
@@ -1042,72 +1048,236 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="resources-layout" *ngIf="currentSection === 'equipo'">
-                <aside class="months-panel">
-                    <h3 class="panel-title">Roles Asignados</h3>
-                    <ul class="month-list">
-                        <li class="month-item">
-                            <div class="role-info">
-                                <span>Project Manager</span>
-                                <span class="role-count"> 1/1</span>
-                            </div>
-                        </li>
-                        <li class="month-item active">
-                            <div class="role-info">
-                                <span>Front</span>
-                                <span class="role-count"> 3/4</span>
-                            </div>
-                        </li>
-                        <li class="month-item">
-                            <div class="role-info">
-                                <span>Back</span>
-                                <span class="role-count"> 2/2</span>
-                            </div>
-                        </li>
-                        <li class="month-item">
-                            <div class="role-info">
-                                <span>Diseñador Interfaz</span>
-                                <span class="role-count"> 0/1</span>
-                            </div>
-                        </li>
-                        <li class="month-item">
-                            <div class="role-info">
-                                <span>Stackholder</span>
-                                <span class="role-count"> 0/1</span>
-                            </div>
-                        </li>
-                    </ul>
-                </aside>
-
-                <div class="resources-content">
-                    <div class="resources-header">
-                        <h2>Miembros: Front</h2>
-                        <button class="btn-add">
-                            <span class="material-icons">person_add</span>
-                            Crear nuevo
-                        </button>
-                    </div>
-
-                    <div class="docs-grid">
-                        <div class="doc-item">
-                            <span class="material-icons">face</span>
-                            <p>Gael Valenzuela</p>
-                            <span class="file-type">SENIOR</span>
+                <div class="modal-overlay" *ngIf="showPermissionsModal">
+                    <div class="modal-container interview-modal">
+                        <div class="modal-header">
+                            <h3>Permisos — {{ selectedCategory?.name }}</h3>
+                            <button class="btn-close" (click)="showPermissionsModal=false">
+                                <span class="material-icons">close</span>
+                            </button>
                         </div>
-                        <div class="doc-item">
-                            <span class="material-icons">face_6</span>
-                            <p>¿¿¿FILIBERTO???</p>
-                            <span class="file-type">JUNIOR</span>
+
+                        <div class="modal-body scrollable-body">
+
+                            <label class="section-label">Permisos actuales</label>
+
+                            <div *ngIf="isLoadingPermissions" style="text-align:center;padding:20px 0">
+                                <span class="material-icons" style="font-size:32px;color:#38b2ac;animation:spin 1s linear infinite">autorenew</span>
+                            </div>
+
+                            <div *ngIf="!isLoadingPermissions && categoryPermissions.length === 0" style="color:#a0aec0;font-size:0.9rem;margin-bottom:16px">
+                                Sin permisos asignados aún.
+                            </div>
+
+                            <div *ngFor="let perm of categoryPermissions"
+                                 style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #edf2f7">
+                                <div>
+                                    <p style="font-weight:600;color:#2d3748">{{ perm.name }}</p>
+                                    <p style="font-size:0.8rem;color:#a0aec0">{{ perm.email }}</p>
+                                    <p style="font-size:0.8rem;color:#38b2ac;margin-top:2px">{{ permissionLabel(perm.permission) }}</p>
+                                </div>
+                                <button class="btn-icon-small" title="Revocar" (click)="revokePermission(perm)">
+                                    <span class="material-icons" style="color:#e53e3e">remove_circle_outline</span>
+                                </button>
+                            </div>
+
+                            <hr class="divider">
+
+                            <label class="section-label">Asignar permiso</label>
+
+                            <div *ngIf="grantPermissionError" style="color:#e53e3e;font-size:0.9rem;margin-bottom:12px">{{ grantPermissionError }}</div>
+
+                            <div class="form-group">
+                                <label>Correo del miembro</label>
+                                <div class="input-with-icon">
+                                    <span class="material-icons">search</span>
+                                    <input type="email"
+                                           [(ngModel)]="permissionMemberSearch"
+                                           placeholder="usuario@correo.com"
+                                           (keydown.enter)="searchPermissionMember()">
+                                </div>
+                            </div>
+
+                            <button class="btn-add" style="margin-bottom:16px"
+                                    (click)="searchPermissionMember()"
+                                    [disabled]="!permissionMemberSearch.trim() || isSearchingPermMember">
+                                {{ isSearchingPermMember ? 'Buscando...' : 'Buscar' }}
+                            </button>
+
+                            <div *ngIf="permissionMemberError" style="color:#e53e3e;font-size:0.9rem;margin-bottom:12px">{{ permissionMemberError }}</div>
+
+                            <div *ngIf="permissionMemberResult" style="background:#f0fff4;border:1px solid #9ae6b4;border-radius:8px;padding:12px;margin-bottom:16px;display:flex;align-items:center;gap:10px">
+                                <span class="material-icons" style="font-size:32px;color:#38b2ac">account_circle</span>
+                                <div>
+                                    <p style="font-weight:600;color:#2d3748">{{ permissionMemberResult.name }}</p>
+                                    <p style="font-size:0.85rem;color:#718096">{{ permissionMemberResult.email }}</p>
+                                </div>
+                            </div>
+
+                            <div *ngIf="permissionMemberResult">
+                                <label class="section-label" style="margin-bottom:10px">Permisos a otorgar</label>
+                                <div style="display:flex;flex-direction:column;gap:10px">
+                                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+                                        <input type="checkbox" [(ngModel)]="newPermission.canRead">
+                                        <span style="font-weight:600;color:#2d3748">Lectura</span>
+                                        <span style="font-size:0.8rem;color:#a0aec0">(bit 1) — puede ver los archivos</span>
+                                    </label>
+                                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+                                        <input type="checkbox" [(ngModel)]="newPermission.canEdit">
+                                        <span style="font-weight:600;color:#2d3748">Edición</span>
+                                        <span style="font-size:0.8rem;color:#a0aec0">(bit 2) — puede modificar archivos</span>
+                                    </label>
+                                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+                                        <input type="checkbox" [(ngModel)]="newPermission.canCreate">
+                                        <span style="font-weight:600;color:#2d3748">Creación</span>
+                                        <span style="font-size:0.8rem;color:#a0aec0">(bit 4) — puede subir archivos</span>
+                                    </label>
+                                </div>
+                            </div>
+
                         </div>
-                        <div class="doc-item">
-                            <span class="material-icons">face_3</span>
-                            <p>Alan Angulo 🤣🤣</p>
-                            <span class="file-type">JUNIOR</span>
+
+                        <div class="modal-footer">
+                            <button class="btn-cancel" (click)="showPermissionsModal=false">Cerrar</button>
+                            <button class="btn-save"
+                                    *ngIf="permissionMemberResult"
+                                    (click)="grantPermission()"
+                                    [disabled]="computePermission() === 0 || isGrantingPermission">
+                                {{ isGrantingPermission ? 'Guardando...' : 'Otorgar Permiso' }}
+                            </button>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="resources-layout" *ngIf="currentSection === 'equipo'">
+
+                <div *ngIf="!selectedProject" style="text-align:center; padding: 60px 0; flex:1">
+                    <span class="material-icons" style="font-size:48px;color:#cbd5e0">info</span>
+                    <p style="color:#a0aec0;margin-top:15px">Selecciona un proyecto desde Inicio para ver su equipo.</p>
+                </div>
+
+                <ng-container *ngIf="selectedProject">
+                    <aside class="months-panel">
+                        <h3 class="panel-title">Roles</h3>
+                        <ul class="month-list">
+                            <li class="month-item"
+                                [class.active]="selectedRoleFilter === ''"
+                                (click)="selectedRoleFilter = ''">
+                                <div class="role-info">
+                                    <span>Todos</span>
+                                    <span class="role-count">{{ teamMembers.length }}</span>
+                                </div>
+                            </li>
+                            <li class="month-item"
+                                *ngFor="let role of uniqueRoles"
+                                [class.active]="selectedRoleFilter === role.name"
+                                (click)="selectedRoleFilter = role.name">
+                                <div class="role-info">
+                                    <span>{{ role.name }}</span>
+                                    <span class="role-count">{{ role.count }}</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </aside>
+
+                    <div class="resources-content">
+                        <div class="resources-header">
+                            <h2>Miembros del Equipo</h2>
+                            <button class="btn-add" (click)="openAddMemberModal()">
+                                <span class="material-icons">person_add</span>
+                                Añadir miembro
+                            </button>
+                        </div>
+
+                        <div *ngIf="isLoadingTeam" style="text-align:center;padding:40px 0">
+                            <span class="material-icons" style="font-size:40px;color:#38b2ac;animation:spin 1s linear infinite">autorenew</span>
+                            <p style="color:#a0aec0;margin-top:12px">Cargando equipo...</p>
+                        </div>
+
+                        <div *ngIf="teamError && !isLoadingTeam" style="text-align:center;padding:40px 0">
+                            <span class="material-icons" style="font-size:40px;color:#e53e3e">error_outline</span>
+                            <p style="color:#e53e3e;margin-top:12px">{{ teamError }}</p>
+                        </div>
+
+                        <div *ngIf="!isLoadingTeam && !teamError && teamMembers.length === 0" style="text-align:center;padding:40px 0">
+                            <span class="material-icons" style="font-size:40px;color:#cbd5e0">group_off</span>
+                            <p style="color:#a0aec0;margin-top:12px">No hay miembros en este proyecto aún.</p>
+                        </div>
+
+                        <div class="docs-grid" *ngIf="!isLoadingTeam && teamMembers.length > 0">
+                            <div class="doc-item" *ngFor="let member of filteredTeamMembers">
+                                <span class="material-icons">account_circle</span>
+                                <p>{{ member.name || ('Usuario #' + member.id_user) }}</p>
+                                <span class="file-type">{{ member.role }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-overlay" *ngIf="showAddMemberModal">
+                        <div class="modal-container">
+                            <div class="modal-header">
+                                <h3>Añadir Miembro</h3>
+                                <button class="btn-close" (click)="closeAddMemberModal()">
+                                    <span class="material-icons">close</span>
+                                </button>
+                            </div>
+
+                            <div class="modal-body">
+                                <div *ngIf="addMemberError" style="background:rgba(220,53,69,0.1);color:#e53e3e;padding:10px;border-radius:8px;margin-bottom:15px;text-align:center">
+                                    {{ addMemberError }}
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Correo electrónico</label>
+                                    <div class="input-with-icon">
+                                        <span class="material-icons">search</span>
+                                        <input type="email"
+                                               [(ngModel)]="memberSearchEmail"
+                                               placeholder="usuario@correo.com"
+                                               (keydown.enter)="searchMemberByEmail()">
+                                    </div>
+                                </div>
+
+                                <button class="btn-add"
+                                        style="margin-bottom:20px"
+                                        (click)="searchMemberByEmail()"
+                                        [disabled]="!memberSearchEmail.trim() || isSearchingMember">
+                                    {{ isSearchingMember ? 'Buscando...' : 'Buscar' }}
+                                </button>
+
+                                <div *ngIf="memberSearchError" style="color:#e53e3e;font-size:0.9rem;margin-bottom:15px">
+                                    {{ memberSearchError }}
+                                </div>
+
+                                <div *ngIf="memberSearchResult" style="background:#f0fff4;border:1px solid #9ae6b4;border-radius:8px;padding:15px;margin-bottom:20px;display:flex;align-items:center;gap:12px">
+                                    <span class="material-icons" style="font-size:36px;color:#38b2ac">account_circle</span>
+                                    <div>
+                                        <p style="font-weight:600;color:#2d3748">{{ memberSearchResult.name }}</p>
+                                        <p style="font-size:0.85rem;color:#718096">{{ memberSearchResult.email }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" *ngIf="memberSearchResult">
+                                    <label>Rol en el proyecto</label>
+                                    <input type="text"
+                                           [(ngModel)]="newMemberRole"
+                                           placeholder="ej: Frontend, Backend, PM, Diseñador...">
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn-cancel" (click)="closeAddMemberModal()" [disabled]="isAddingMember">Cancelar</button>
+                                <button class="btn-save"
+                                        (click)="addMemberToProject()"
+                                        [disabled]="!memberSearchResult || !newMemberRole.trim() || isAddingMember">
+                                    {{ isAddingMember ? 'Agregando...' : 'Agregar al Proyecto' }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
             </div>
 
             <div class="projects-view" *ngIf="currentSection === 'configuracion'" style="padding-top: 20px;">

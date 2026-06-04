@@ -9,7 +9,7 @@ import projectsRouter from './CrudsNew/Projects.js';
 import categorysRouter from './CrudsNew/Categorys.js';
 import resourcesRouter from './CrudsNew/Resources.js';
 import userlogproyect from './CrudsNew/User_logs.js';
-import { use } from 'react';
+import permissionsRouter from './CrudsNew/Permissions.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,6 +24,7 @@ app.use('/api/projects', projectsRouter);
 app.use('/api/categories', categorysRouter);
 app.use('/api/resources', resourcesRouter);
 app.use('/api/userlog', userlogproyect);
+app.use('/api/permissions', permissionsRouter);
 const dbConfig = dbconfig;
 let pool;
 
