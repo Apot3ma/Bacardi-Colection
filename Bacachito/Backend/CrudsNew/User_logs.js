@@ -36,7 +36,7 @@ router.get('/:id_project', async (req,res)=>{
      const {id_project} = req.params;
     try{
         const [result] = await pool.query(
-            'SELECT * FROM user_log_project WHERE id_project = ? VALUES (?)',
+            'SELECT * FROM user_log_project WHERE id_project = ?',
             [id_project]
         );
          if (result.length === 0) {
@@ -52,20 +52,27 @@ router.get('/:id_project', async (req,res)=>{
 // ===========================================
 // ==VER TODOS LOS USUARIOS DE UNA CATEGORIA==
 // ===========================================
-router.get('/:role', async (req,res)=>{
-    const pool =req.app.locals.pool;
-     const {role} = req.params;
-    try{
+router.get('/:role', async (req, res) => {
+    const pool = req.app.locals.pool;
+    const { role } = req.params;
+    try {
         const [result] = await pool.query(
-            'SELECT * FROM user_log_project WHERE role = ? VALUES (?)',
+            `SELECT 
+                u.id,
+                u.name,
+                u.email,
+                ulp.role,
+                ulp.project_id
+            FROM users u
+            INNER JOIN user_log_project ulp ON u.id = ulp.user_id
+            WHERE ulp.role = ?`,
             [role]
         );
-         if (result.length === 0) {
-            return res.status(404).json({ error: 'no existe el rol' });
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'No hay usuarios en este rol' });
         }
-        res.json(result);       
-    }catch(err){
-        res.status(500).json({error: 'Error', details:err.message}
-        )
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: 'Error', details: err.message });
     }
 });
