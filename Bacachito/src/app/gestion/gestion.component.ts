@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ProjectService, Project } from '../services/project.service';
 import { CategoryService, Category } from '../services/category.service';
 import { ResourceService, Resource } from '../services/resource.service';
+import { TeamService, TeamMember, UserSearchResult } from '../services/team.service';
+import { PermissionService, CategoryPermission } from '../services/permission.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -72,6 +74,32 @@ export class GestionComponent implements OnInit {
   recentResources: Resource[] = [];
   isLoadingRecent: boolean = false;
   recentError: string | null = null;
+
+  teamMembers: TeamMember[] = [];
+  isLoadingTeam: boolean = false;
+  teamError: string | null = null;
+  showAddMemberModal: boolean = false;
+  memberSearchEmail: string = '';
+  memberSearchResult: UserSearchResult | null = null;
+  memberSearchError: string | null = null;
+  isSearchingMember: boolean = false;
+  newMemberRole: string = '';
+  isAddingMember: boolean = false;
+  addMemberError: string | null = null;
+  selectedRoleFilter: string = '';
+
+  showPermissionsModal: boolean = false;
+  categoryPermissions: CategoryPermission[] = [];
+  isLoadingPermissions: boolean = false;
+  permissionsError: string | null = null;
+  newPermission = { id_user: 0, canRead: false, canEdit: false, canCreate: false };
+  isGrantingPermission: boolean = false;
+  grantPermissionError: string | null = null;
+  permissionMemberSearch: string = '';
+  permissionMemberResult: UserSearchResult | null = null;
+  permissionMemberError: string | null = null;
+  isSearchingPermMember: boolean = false;
+  currentUserPermission: number = 0;
 
   /*
     **
@@ -177,6 +205,8 @@ export class GestionComponent implements OnInit {
     private projectService: ProjectService,
     private categoryService: CategoryService,
     private resourceService: ResourceService,
+    private teamService: TeamService,
+    private permissionService: PermissionService,
     private router: Router
   ) { }
 
@@ -222,6 +252,22 @@ export class GestionComponent implements OnInit {
     this.syncConfigFromSelected();
     this.setSection('dashboard');
     this.loadRecentResources();
+  }
+
+  isProjectLeader(): boolean {
+    return this.selectedProject ? this.selectedProject.id_user === this.userId : false;
+  }
+
+  canReadCategory(): boolean {
+    return (this.currentUserPermission & 1) > 0;
+  }
+
+  canEditCategory(): boolean {
+    return (this.currentUserPermission & 2) > 0;
+  }
+
+  canCreateCategory(): boolean {
+    return (this.currentUserPermission & 4) > 0;
   }
 
   syncConfigFromSelected(): void {
@@ -279,6 +325,192 @@ export class GestionComponent implements OnInit {
     });
   }
 
+  openPermissionsModal(): void {
+    this.showPermissionsModal = true;
+    this.categoryPermissions = [];
+    this.permissionsError = null;
+    this.grantPermissionError = null;
+    this.permissionMemberSearch = '';
+    this.permissionMemberResult = null;
+    this.permissionMemberError = null;
+    this.newPermission = { id_user: 0, canRead: false, canEdit: false, canCreate: false };
+    this.loadCategoryPermissions();
+  }
+
+  loadCategoryPermissions(): void {
+    if (!this.selectedCategory) return;
+    this.isLoadingPermissions = true;
+    this.permissionsError = null;
+    this.permissionService.getPermissionsByCategory(this.selectedCategory.id).subscribe({
+      next: (perms) => {
+        this.categoryPermissions = perms;
+        this.isLoadingPermissions = false;
+      },
+      error: () => {
+        this.isLoadingPermissions = false;
+        this.categoryPermissions = [];
+      }
+    });
+  }
+
+  searchPermissionMember(): void {
+    if (!this.permissionMemberSearch.trim() || !this.selectedProject) return;
+    this.isSearchingPermMember = true;
+    this.permissionMemberResult = null;
+    this.permissionMemberError = null;
+    this.teamService.searchUserByEmail(this.permissionMemberSearch.trim(), this.selectedProject.id).subscribe({
+      next: (user: any) => {
+        this.permissionMemberResult = user;
+        this.isSearchingPermMember = false;
+      },
+      error: (err: any) => {
+        this.isSearchingPermMember = false;
+        this.permissionMemberResult = null;
+        this.permissionMemberError = err.status === 404
+          ? 'No se encontró ningún usuario con ese correo en este proyecto.'
+          : 'Error al buscar el usuario.';
+      }
+    });
+  }
+
+  computePermission(): number {
+    let p = 0;
+    if (this.newPermission.canRead) p += 1;
+    if (this.newPermission.canEdit) p += 2;
+    if (this.newPermission.canCreate) p += 4;
+    return p;
+  }
+
+  grantPermission(): void {
+    if (!this.permissionMemberResult || !this.selectedCategory) return;
+    const perm = this.computePermission();
+    if (perm === 0) return;
+    this.isGrantingPermission = true;
+    this.grantPermissionError = null;
+    this.permissionService.grantPermission({
+      id_user: this.permissionMemberResult.id,
+      id_category: this.selectedCategory.id,
+      permission: perm
+    }).subscribe({
+      next: () => {
+        this.isGrantingPermission = false;
+        this.permissionMemberSearch = '';
+        this.permissionMemberResult = null;
+        this.newPermission = { id_user: 0, canRead: false, canEdit: false, canCreate: false };
+        this.loadCategoryPermissions();
+      },
+      error: () => {
+        this.isGrantingPermission = false;
+        this.grantPermissionError = 'Error al asignar el permiso. Intenta de nuevo.';
+      }
+    });
+  }
+
+  revokePermission(perm: CategoryPermission): void {
+    if (!this.selectedCategory) return;
+    this.permissionService.revokePermission(perm.id_user, this.selectedCategory.id).subscribe({
+      next: () => this.loadCategoryPermissions(),
+      error: () => {}
+    });
+  }
+
+  permissionLabel(p: number): string {
+    const parts: string[] = [];
+    if (p & 1) parts.push('Lectura');
+    if (p & 2) parts.push('Edición');
+    if (p & 4) parts.push('Creación');
+    return parts.length ? parts.join(' + ') : 'Sin permisos';
+  }
+
+  loadTeamMembers(): void {
+    if (!this.selectedProject) return;
+    this.isLoadingTeam = true;
+    this.teamError = null;
+    this.selectedRoleFilter = '';
+    this.teamService.getMembersByProject(this.selectedProject.id).subscribe({
+      next: (members: any) => {
+        this.teamMembers = members;
+        this.isLoadingTeam = false;
+      },
+      error: (err: any) => {
+        this.isLoadingTeam = false;
+        if (err.status === 404) {
+          this.teamMembers = [];
+          this.teamError = null;
+        } else {
+          this.teamError = 'Error al cargar el equipo.';
+        }
+      }
+    });
+  }
+
+  openAddMemberModal(): void {
+    this.showAddMemberModal = true;
+    this.memberSearchEmail = '';
+    this.memberSearchResult = null;
+    this.memberSearchError = null;
+    this.newMemberRole = '';
+    this.addMemberError = null;
+  }
+
+  closeAddMemberModal(): void {
+    this.showAddMemberModal = false;
+  }
+
+  searchMemberByEmail(): void {
+    if (!this.memberSearchEmail.trim()) return;
+    this.isSearchingMember = true;
+    this.memberSearchResult = null;
+    this.memberSearchError = null;
+    this.teamService.searchUserByEmail(this.memberSearchEmail.trim()).subscribe({
+      next: (user: any) => {
+        this.memberSearchResult = user;
+        this.isSearchingMember = false;
+      },
+      error: (err: any) => {
+        this.isSearchingMember = false;
+        this.memberSearchResult = null;
+        this.memberSearchError = err.status === 404
+          ? 'No se encontró ningún usuario con ese correo.'
+          : 'Error al buscar el usuario.';
+      }
+    });
+  }
+
+  addMemberToProject(): void {
+    if (!this.memberSearchResult || !this.newMemberRole.trim() || !this.selectedProject) return;
+    this.isAddingMember = true;
+    this.addMemberError = null;
+    this.teamService.addMember({
+      id_project: this.selectedProject.id,
+      id_user: this.memberSearchResult.id,
+      role: this.newMemberRole.trim()
+    }).subscribe({
+      next: () => {
+        this.isAddingMember = false;
+        this.closeAddMemberModal();
+        this.loadTeamMembers();
+      },
+      error: () => {
+        this.isAddingMember = false;
+        this.addMemberError = 'Error al agregar el miembro. Intenta de nuevo.';
+      }
+    });
+  }
+
+  get uniqueRoles(): { name: string; count: number }[] {
+    const map = new Map<string, number>();
+    for (const m of this.teamMembers) {
+      map.set(m.role, (map.get(m.role) ?? 0) + 1);
+    }
+    return Array.from(map.entries()).map(([name, count]) => ({ name, count }));
+  }
+
+  get filteredTeamMembers(): TeamMember[] {
+    if (!this.selectedRoleFilter) return this.teamMembers;
+    return this.teamMembers.filter(m => m.role === this.selectedRoleFilter);
+  }
+
   setSection(section: string) {
     this.currentSection = section;
     if (section === 'configuracion') {
@@ -289,6 +521,9 @@ export class GestionComponent implements OnInit {
     }
     if (section === 'dashboard' && this.selectedProject) {
       this.loadRecentResources();
+    }
+    if (section === 'equipo' && this.selectedProject) {
+      this.loadTeamMembers();
     }
   }
 
@@ -364,11 +599,39 @@ export class GestionComponent implements OnInit {
     this.selectedCategory = cat;
     this.resources = [];
     this.resourceError = null;
-    this.loadResources();
+
+    if (this.isProjectLeader()) {
+      this.currentUserPermission = 7;
+      this.loadResources();
+    } else {
+      this.currentUserPermission = 0;
+      this.isLoadingResources = true;
+      this.permissionService.getUserPermissionForCategory(this.userId, cat.id).subscribe({
+        next: (res: any) => {
+          this.currentUserPermission = res.permission || 0;
+          if ((this.currentUserPermission & 1) > 0) {
+            this.loadResources();
+          } else {
+            this.isLoadingResources = false;
+            this.resourceError = 'No tienes permiso para ver los recursos de esta categoría.';
+          }
+        },
+        error: () => {
+          this.currentUserPermission = 0;
+          this.isLoadingResources = false;
+          this.resourceError = 'No tienes permiso para acceder a esta categoría.';
+        }
+      });
+    }
   }
 
   loadResources(): void {
     if (!this.selectedCategory) return;
+    if ((this.currentUserPermission & 1) === 0) {
+      this.resources = [];
+      this.resourceError = 'No tienes permiso para ver los recursos de esta categoría.';
+      return;
+    }
     this.isLoadingResources = true;
     this.resourceError = null;
     this.resourceService.getResourcesByCategory(this.selectedCategory.id).subscribe({
