@@ -9,6 +9,7 @@ import projectsRouter from './CrudsNew/Projects.js';
 import categorysRouter from './CrudsNew/Categorys.js';
 import resourcesRouter from './CrudsNew/Resources.js';
 import userlogproyect from './CrudsNew/User_logs.js';
+import procesosRouter from './routes/procesos.js';
 import { use } from 'react';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -24,6 +25,7 @@ app.use('/api/projects', projectsRouter);
 app.use('/api/categories', categorysRouter);
 app.use('/api/resources', resourcesRouter);
 app.use('/api/userlog', userlogproyect);
+app.use('/procesos', procesosRouter);
 const dbConfig = dbconfig;
 let pool;
 

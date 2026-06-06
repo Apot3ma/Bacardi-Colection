@@ -52,6 +52,7 @@ router.get('/:id_project', async (req,res)=>{
 // ===========================================
 // ==VER TODOS LOS USUARIOS DE UNA CATEGORIA==
 // ===========================================
+        // SE SOLICITA EL ROL PARA BUSCAR USUARIOS QUE PERTENESCAN A ESTE
 router.get('/:role', async (req, res) => {
     const pool = req.app.locals.pool;
     const { role } = req.params;
