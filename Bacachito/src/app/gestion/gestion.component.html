@@ -31,6 +31,11 @@
                 <p>Equipo</p>
             </button>
 
+            <button class="menu-item" [class.active]="currentSection === 'diagramas'" (click)="setSection('diagramas')" *ngIf="selectedProject">
+                <span class="material-icons">account_tree</span>
+                <p>Diagramas</p>
+            </button>
+
             <button class="menu-item" [class.active]="currentSection === 'configuracion'"
                 (click)="setSection('configuracion')">
                 <span class="material-icons">settings</span>
@@ -46,6 +51,7 @@
                 currentSection === 'procesos' ? 'Ingeniería de Requisitos' :
                 currentSection === 'recursos' ? 'Gestión de Recursos' :
                 currentSection === 'equipo' ? 'Gestión de Equipo' :
+                currentSection === 'diagramas' ? 'Diagramas UML' :
                 currentSection === 'home' ? ('Mis Proyectos' + (userName ? ' — ' + userName : '')) :
                 currentSection === 'configuracion' ? 'Configuración del proyecto' :
                 'Sección en construcción' }}</h1>
@@ -1352,8 +1358,119 @@
                 </div>
             </div>
 
+            <div class="resources-layout" *ngIf="currentSection === 'diagramas'">
+                <div *ngIf="!selectedProject" style="text-align:center; padding: 60px 0; flex:1">
+                    <span class="material-icons" style="font-size:48px;color:#cbd5e0">info</span>
+                    <p style="color:#a0aec0;margin-top:15px">Selecciona un proyecto desde Inicio para ver sus diagramas.</p>
+                </div>
+
+                <ng-container *ngIf="selectedProject">
+                    <aside class="months-panel">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                            <h3 class="panel-title" style="margin-bottom:0;">Diagramas</h3>
+                            <button class="btn-add" style="padding:4px 10px; font-size:0.8rem;" (click)="showNewDiagramModal=true; createDiagramError=null">
+                                <span class="material-icons" style="font-size:16px;">add</span>
+                            </button>
+                        </div>
+
+                        <div *ngIf="isLoadingDiagrams" style="text-align:center; padding:20px 0;">
+                            <span class="material-icons" style="font-size:32px; color:#38b2ac; animation: spin 1s linear infinite;">autorenew</span>
+                        </div>
+
+                        <div *ngIf="diagramsError" style="color:#e53e3e; font-size:0.8rem; margin-bottom:8px;">{{ diagramsError }}</div>
+
+                        <ul class="month-list" *ngIf="!isLoadingDiagrams">
+                            <li *ngIf="diagrams.length === 0" style="color:#a0aec0; font-size:0.85rem; padding:10px 0;">Sin diagramas</li>
+                            <li class="month-item"
+                                *ngFor="let diag of diagrams"
+                                [class.active]="selectedDiagram && selectedDiagram.id === diag.id"
+                                (click)="selectDiagram(diag)"
+                                style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                                <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:140px;">{{ diag.name }}</span>
+                                <button class="btn-icon-small" title="Eliminar" (click)="deleteDiagram(diag.id!); $event.stopPropagation()">
+                                    <span class="material-icons" style="font-size:16px; color:#e53e3e;">delete</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </aside>
+
+                    <div class="resources-content" style="display: flex; flex-direction: column; height: 100%;">
+                        <div *ngIf="!selectedDiagram" style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#a0aec0; min-height:400px;">
+                            <span class="material-icons" style="font-size:48px; margin-bottom:16px;">account_tree</span>
+                            <p>Selecciona o crea un diagrama para comenzar a editar</p>
+                        </div>
+
+                        <ng-container *ngIf="selectedDiagram">
+                            <div class="resources-header">
+                                <div style="display:flex; align-items:center; gap:12px; flex:1;">
+                                    <input type="text"
+                                           class="diagram-name-input"
+                                           [(ngModel)]="selectedDiagram.name"
+                                           (ngModelChange)="onNameChange($event)"
+                                           style="font-size:1.5rem; font-weight:700; background:transparent; border:none; border-bottom:2px dashed #4ed9d9; color:#e2e8f0; outline:none; padding:2px 6px; width:70%;">
+                                </div>
+                                <div style="display:flex; gap:12px; align-items:center;">
+                                    <span *ngIf="isSavingDiagram" style="color:#4ed9d9; font-size:0.9rem;">Guardando...</span>
+                                    <span *ngIf="saveDiagramError" style="color:#e53e3e; font-size:0.9rem;">{{ saveDiagramError }}</span>
+                                    <button class="btn-add" (click)="saveDiagram()" [disabled]="isSavingDiagram || !selectedDiagram.name.trim()">
+                                        <span class="material-icons">save</span>
+                                        Guardar
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="diagram-editor-layout">
+                                <div class="editor-pane">
+                                    <textarea class="diagram-textarea"
+                                              [(ngModel)]="selectedDiagram.content"
+                                              (ngModelChange)="onCodeChange($event)"
+                                              placeholder="Escribe código Mermaid aquí..."></textarea>
+                                </div>
+                                <div class="preview-pane">
+                                    <div id="mermaid-preview-container" class="diagram-preview"></div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+
+                    <div class="modal-overlay" *ngIf="showNewDiagramModal">
+                        <div class="modal-container">
+                            <div class="modal-header">
+                                <h3>Nuevo Diagrama UML</h3>
+                                <button class="btn-close" (click)="showNewDiagramModal=false">
+                                    <span class="material-icons">close</span>
+                                </button>
+                            </div>
+
+                            <div class="modal-body">
+                                <div *ngIf="createDiagramError" style="background:rgba(220,53,69,0.1);color:#e53e3e;padding:10px;border-radius:8px;margin-bottom:15px;text-align:center">
+                                    {{ createDiagramError }}
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Nombre del Diagrama</label>
+                                    <input type="text"
+                                           [(ngModel)]="newDiagramName"
+                                           placeholder="ej: Diagrama de Clases, Flujo de Compra..."
+                                           (keydown.enter)="createDiagram()">
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn-cancel" (click)="showNewDiagramModal=false" [disabled]="isCreatingDiagram">Cancelar</button>
+                                <button class="btn-save"
+                                        (click)="createDiagram()"
+                                        [disabled]="!newDiagramName.trim() || isCreatingDiagram">
+                                    {{ isCreatingDiagram ? 'Creando...' : 'Crear Diagrama' }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+
             <div *ngIf="currentSection !== 'dashboard' && currentSection !== 'recursos' && currentSection !== 'equipo' 
-        && currentSection !== 'home' && currentSection !== 'procesos' && currentSection !== 'configuracion'"
+        && currentSection !== 'home' && currentSection !== 'procesos' && currentSection !== 'configuracion' && currentSection !== 'diagramas'"
                 style="text-align: center; padding-top: 50px;">
                 <span class="material-icons" style="font-size: 48px; color: #cbd5e0;">construction</span>
                 <p style="color: #a0aec0; margin-top: 10px;">Esta sección está en desarrollo.</p>

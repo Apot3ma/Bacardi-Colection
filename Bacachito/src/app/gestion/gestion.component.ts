@@ -6,6 +6,7 @@ import { CategoryService, Category } from '../services/category.service';
 import { ResourceService, Resource } from '../services/resource.service';
 import { TeamService, TeamMember, UserSearchResult } from '../services/team.service';
 import { PermissionService, CategoryPermission } from '../services/permission.service';
+import { DiagramService, Diagram } from '../services/diagram.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -100,6 +101,20 @@ export class GestionComponent implements OnInit {
   permissionMemberError: string | null = null;
   isSearchingPermMember: boolean = false;
   currentUserPermission: number = 0;
+
+  diagrams: Diagram[] = [];
+  selectedDiagram: Diagram | null = null;
+  isLoadingDiagrams: boolean = false;
+  diagramsError: string | null = null;
+  isSavingDiagram: boolean = false;
+  saveDiagramError: string | null = null;
+  showNewDiagramModal: boolean = false;
+  newDiagramName: string = '';
+  isCreatingDiagram: boolean = false;
+  createDiagramError: string | null = null;
+  mermaidLoaded: boolean = false;
+  private renderTimeout: any = null;
+
 
   /*
     **
@@ -207,6 +222,7 @@ export class GestionComponent implements OnInit {
     private resourceService: ResourceService,
     private teamService: TeamService,
     private permissionService: PermissionService,
+    private diagramService: DiagramService,
     private router: Router
   ) { }
 
@@ -524,6 +540,10 @@ export class GestionComponent implements OnInit {
     }
     if (section === 'equipo' && this.selectedProject) {
       this.loadTeamMembers();
+    }
+    if (section === 'diagramas' && this.selectedProject) {
+      this.loadDiagrams();
+      this.loadMermaidScript();
     }
   }
 
@@ -1024,6 +1044,163 @@ export class GestionComponent implements OnInit {
     if (this.newTransaction.steps.length > 1) {
       this.newTransaction.steps.splice(index, 1);
     }
+  }
+
+  loadMermaidScript(): void {
+    if (this.mermaidLoaded) {
+      return;
+    }
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const win = window as any;
+    if (win.mermaid) {
+      this.mermaidLoaded = true;
+      win.mermaid.initialize({ startOnLoad: false, theme: 'default' });
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js';
+    script.type = 'text/javascript';
+    script.onload = () => {
+      this.mermaidLoaded = true;
+      if (win.mermaid) {
+        win.mermaid.initialize({ startOnLoad: false, theme: 'default' });
+      }
+      if (this.selectedDiagram) {
+        this.renderMermaid(this.selectedDiagram.content);
+      }
+    };
+    document.body.appendChild(script);
+  }
+
+  async renderMermaid(content: string): Promise<void> {
+    if (!this.mermaidLoaded || typeof window === 'undefined') {
+      return;
+    }
+    const element = document.getElementById('mermaid-preview-container');
+    if (!element) {
+      return;
+    }
+    if (!content.trim()) {
+      element.innerHTML = '';
+      return;
+    }
+    try {
+      const uniqueId = 'mermaid-' + Math.floor(Math.random() * 1000000);
+      const win = window as any;
+      const { svg } = await win.mermaid.render(uniqueId, content);
+      element.innerHTML = svg;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  onCodeChange(code: string): void {
+    if (this.selectedDiagram) {
+      this.selectedDiagram.content = code;
+    }
+    if (this.renderTimeout) {
+      clearTimeout(this.renderTimeout);
+    }
+    this.renderTimeout = setTimeout(() => {
+      this.renderMermaid(code);
+    }, 600);
+  }
+
+  onNameChange(name: string): void {
+    if (this.selectedDiagram) {
+      this.selectedDiagram.name = name;
+    }
+  }
+
+  loadDiagrams(): void {
+    if (!this.selectedProject) return;
+    this.isLoadingDiagrams = true;
+    this.diagramsError = null;
+    this.diagramService.getDiagramsByProject(this.selectedProject.id).subscribe({
+      next: (data) => {
+        this.diagrams = data;
+        this.isLoadingDiagrams = false;
+        if (data.length > 0) {
+          this.selectDiagram(data[0]);
+        } else {
+          this.selectedDiagram = null;
+          const element = document.getElementById('mermaid-preview-container');
+          if (element) {
+            element.innerHTML = '';
+          }
+        }
+      },
+      error: () => {
+        this.isLoadingDiagrams = false;
+        this.diagramsError = 'Error al cargar los diagramas.';
+      }
+    });
+  }
+
+  selectDiagram(diag: Diagram): void {
+    this.selectedDiagram = { ...diag };
+    this.saveDiagramError = null;
+    setTimeout(() => {
+      this.renderMermaid(this.selectedDiagram?.content || '');
+    }, 50);
+  }
+
+  createDiagram(): void {
+    if (!this.selectedProject || !this.newDiagramName.trim()) return;
+    this.isCreatingDiagram = true;
+    this.createDiagramError = null;
+    const defaultContent = 'graph TD\n    A[Inicio] --> B(Proceso)\n    B --> C{Decision}\n    C -->|Si| D[Fin]\n    C -->|No| E[Reintentar]';
+    this.diagramService.createDiagram({
+      id_project: this.selectedProject.id,
+      name: this.newDiagramName.trim(),
+      content: defaultContent
+    }).subscribe({
+      next: () => {
+        this.isCreatingDiagram = false;
+        this.showNewDiagramModal = false;
+        this.newDiagramName = '';
+        this.loadDiagrams();
+      },
+      error: () => {
+        this.isCreatingDiagram = false;
+        this.createDiagramError = 'Error al crear el diagrama.';
+      }
+    });
+  }
+
+  saveDiagram(): void {
+    if (!this.selectedDiagram || !this.selectedDiagram.id) return;
+    this.isSavingDiagram = true;
+    this.saveDiagramError = null;
+    this.diagramService.updateDiagram(this.selectedDiagram.id, {
+      name: this.selectedDiagram.name,
+      content: this.selectedDiagram.content
+    }).subscribe({
+      next: () => {
+        this.isSavingDiagram = false;
+        const index = this.diagrams.findIndex(d => d.id === this.selectedDiagram!.id);
+        if (index !== -1) {
+          this.diagrams[index] = { ...this.selectedDiagram! };
+        }
+      },
+      error: () => {
+        this.isSavingDiagram = false;
+        this.saveDiagramError = 'Error al guardar el diagrama.';
+      }
+    });
+  }
+
+  deleteDiagram(id: number): void {
+    this.diagramService.deleteDiagram(id).subscribe({
+      next: () => {
+        this.loadDiagrams();
+      },
+      error: () => {
+        this.diagramsError = 'Error al eliminar el diagrama.';
+      }
+    });
   }
 
 }
